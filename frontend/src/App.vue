@@ -1,15 +1,8 @@
-<script setup>
-import WelcomeScreen from "./presentation/screens/WelcomeScreen.vue";
+<template>
+  <router-view></router-view>  <!-- <- placeholder for current screen -->
+</template>
 
-function onWelcomeAction() {
-  console.log("Welcome to the Human Rights Storytelling App!");
-}
+<script setup>
+import router from './router.js'  // import router
 </script>
 
-<template>
-  <WelcomeScreen
-    backgroundName="CMHR_exterior.jpg"
-    @startScan="onWelcomeAction"
-    @skipScan="onWelcomeAction"
-  />
-</template>

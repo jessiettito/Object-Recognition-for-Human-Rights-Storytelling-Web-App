@@ -38,11 +38,11 @@
         <h1 id="welcomeTitle" class="welcomeTitle">{{ screenText.title }}</h1>
 
         <div class="buttonGroup">
-          <button class="mainButton startButton" type="button" @click="emit('startScan')">
+          <button class="mainButton startButton" type="button" @click="$router.push('/')">
             {{ screenText.startButtonText }}
           </button>
 
-          <button class="mainButton chooseButton" type="button" @click="emit('skipScan')">
+          <button class="mainButton chooseButton" type="button" @click="$router.push('/list')">
             {{ screenText.chooseButtonText }}
           </button>
         </div>
@@ -55,6 +55,9 @@
 
 <script setup>
 import { computed, ref } from "vue";
+import { useRouter } from 'vue-router'
+const router = useRouter();
+
 
 // Direct imports 
 import cmhrExteriorPhoto from "../../assets/backgrounds/CMHR_exterior.jpg";
@@ -107,6 +110,16 @@ const chosenBackgroundPhotoUrl = computed(() => {
 const backgroundStyle = computed(() => ({
   backgroundImage: `url("${chosenBackgroundPhotoUrl.value}")`,
 }));
+
+//router control
+function startScan() {
+  router.push('/list')
+}
+
+function skipScan() {
+  router.push('/list')
+}
+
 </script>
 
 <style scoped>
