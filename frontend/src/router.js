@@ -4,7 +4,7 @@ import ListScreen from './presentation/screens/ListScreen.vue'
 
 const routes = [
   { path: '/', component: WelcomeScreen },
-  { path: '/capture', component: ListScreen }
+  { path: '/list', component: ListScreen }
 ]
 
 const router = createRouter({
