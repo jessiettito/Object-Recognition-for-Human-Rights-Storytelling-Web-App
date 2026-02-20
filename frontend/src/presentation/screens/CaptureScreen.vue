@@ -67,7 +67,7 @@ import cmhrInteriorPhoto from "../../assets/backgrounds/CMHR_interior.jpg";
 const props = defineProps({
   appTitle: { type: String, default: "Human Rights Object Stories" },
   backgroundName: { type: String, default: "CMHR_interior.jpg" },
-  defaultLanguage: { type: String, default: "en" },
+  language: { type: String, default: "en" },
 });
 
 const router = useRouter();

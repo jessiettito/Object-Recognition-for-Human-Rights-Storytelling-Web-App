@@ -43,8 +43,7 @@ const props = defineProps({
 
   backgroundName: { type: String, default: "CMHR_exterior.jpg" },
 
-  // "en" or "fr"
-  defaultLanguage: { type: String, default: "en" },
+  language: { type: String, default: "en" },
 });
 
 
