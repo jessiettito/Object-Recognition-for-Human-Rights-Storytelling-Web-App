@@ -147,7 +147,6 @@ function capturePhoto() {
 
   const canvasEl = canvas.value
   const videoEl = video.value
-
   const ctx = canvas.value.getContext("2d")
 
   canvas.value.width = video.value.videoWidth
@@ -170,8 +169,7 @@ function capturePhoto() {
  
   // Show result window
   showResultModal.value = true
-
-  return photo
+  console.log("Captured photo stored")
 }
 
 async function retakePhoto() {
@@ -179,17 +177,21 @@ async function retakePhoto() {
   capturedPhoto.value = null
 
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: true
-    })
-
-    video.value.srcObject = stream
-    cameraStarted.value = true
+    await restartCamera()
 
   } catch (err) {
     console.error(err)
     alert("Unable to restart camera")
   }
+}
+
+async function restartCamera() {
+  stream = await navigator.mediaDevices.getUserMedia({
+    video: true
+  })
+
+  video.value.srcObject = stream
+  cameraStarted.value = true
 }
 
 /* Navigation */
