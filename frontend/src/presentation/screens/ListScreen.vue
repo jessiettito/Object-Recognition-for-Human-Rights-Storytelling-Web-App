@@ -4,87 +4,115 @@
     <h1 class="title">Explore Topics</h1>
   </header>
 
-  <!-- Objects list -->
-  <div class="list-container left">
-    <h2 class="list-title">Objects</h2>
-    <div class="scroll-list">
-      <div v-for="item in items" :key="item" class="item">
-        {{ item }}
+  <div class="lists-wrapper">
+
+    <!-- Objects list -->
+    <div class="list-card">
+      <h2 class="list-title">Objects</h2>
+      <div class="scroll-list">
+        <div v-for="item in objects" :key="item" class="item">
+          {{ item.name }}
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Topics list -->
-  <div class="list-container right">
-    <h2 class="list-title">Topics</h2>
-    <div class="scroll-list">
-      <div v-for="item in items" :key="item" class="item">
-        {{ item }}
+    <!-- Topics list -->
+    <div class="list-card">
+      <h2 class="list-title">Topics</h2>
+      <div class="scroll-list"> 
+        <div v-for="item in topics" :key="item" class="item">
+          {{ item.name }}
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { openBlock, ref } from 'vue'
 const items = ref([])
 
-// Fill with 50 items just for demo
-for (let i = 1; i <= 50; i++) {
-  items.value.push(`Item ${i}`)
-}
+/* Mock data */
+const objects = ref(
+  Array.from({ length: 50 }, (_, i) => ({
+    id: i,
+    name: `Object ${i + 1}`
+  }))
+)
+
+const topics = ref(
+  Array.from({ length: 50 }, (_, i) => ({
+    id: i,
+    name: `Topic ${i + 1}`
+  }))
+)
 </script>
 
 
 <style scoped>
-header {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+.page {
+  min-height: 100vh;
+  padding: 40px 5vw;
+  background: #f7f9fc;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  width: auto;
+}
+
+.header {
+  margin-bottom: 40px;
 }
 
 .title {
   margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.lists-wrapper {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 40px;
+  max-width: 1100px;
+}
+
+.list-card {
+  background: white;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  height: 70vh;
 }
 
 .list-title {
   text-align: center;
-  margin: 0 0 10px 0;  /* some spacing below title */
-  flex-shrink: 0;     /* don’t shrink title */
+  margin-bottom: 15px;
+  font-size: 1.3rem;
 
 }
 
-.list-container {
-  position: absolute;
-  top: 100px;      /* distance from top */
-  height: 200px;   /* fixed height */
-  width: 300px;    /* fixed width */
-  display: flex;
-  flex-direction: column; /* stack title + list vertically */
-}
-
-.list-container.left {
-  left: 50px;      /* left side */
-}
-
-.list-container.right {
-  right: 50px;     /* right side */
-}
 
 .scroll-list {
-  height: 160px;       /* slightly smaller than container to leave space for title */
+  flex: 1;
   overflow-y: auto;
-  border: 1px solid #ccc;
-  padding: 10px;
+  border-radius: 12px;
+  padding-right: 6px;
 }
 
 .item {
-  padding: 8px;
-  border-bottom: 1px solid #eee;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  background: #f1f5fb;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.item:hover {
+  transform: translateY(-2px);
+  background: #e6eefc;
 }
 </style>
