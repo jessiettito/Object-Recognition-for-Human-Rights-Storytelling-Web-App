@@ -1,32 +1,40 @@
 <!-- frontend/src/presentation/screens/ResultScreen.vue -->
 <template>
   <main class="resultScreen" role="main" aria-label="Result screen">
-    <!-- Use captured image as background (blurred) -->
+    <!-- Captured image as blurred background -->
     <div class="backgroundLayers" aria-hidden="true">
-      <div class="backgroundPhoto" :style="capturedBgStyle"></div>
-      <div class="backgroundPhotoBlur strongBlur" :style="capturedBgStyle"></div>
+      <div class="backgroundPhoto" :style="backgroundImageStyle"></div>
+      <div class="backgroundPhotoBlur strongBlur" :style="backgroundImageStyle"></div>
       <div class="backgroundDarkenOverlay"></div>
     </div>
 
-    <section class="centerArea" aria-labelledby="resultTitle">
+    <section class="contentArea" aria-labelledby="objectName">
       <div class="resultCard">
-        <h1 id="resultTitle" class="resultTitle">{{ titleText }}</h1>
-
-        <div class="previewFrame" aria-label="Captured image preview">
-          <img v-if="capturedImageUrl" class="previewImage" :src="capturedImageUrl" :alt="titleText" />
-          <div v-else class="previewFallback">No image</div>
+        <!-- Circle preview on the side -->
+        <div class="circlePreview" aria-label="Object preview">
+          <img
+            v-if="capturedImageDataUrl"
+            class="circleImage"
+            :src="capturedImageDataUrl"
+            :alt="objectNameText"
+          />
+          <div v-else class="circleFallback">No image</div>
         </div>
 
-        <div class="buttonGroup">
-          <button class="mainButton startButton" type="button" @click="continueFlow">
-            {{ uiText.continue }}
-          </button>
-          <button class="mainButton secondaryButton" type="button" @click="tryAgain">
-            {{ uiText.tryAgain }}
-          </button>
-        </div>
+        <!-- Object name in the center -->
+        <div class="resultText">
+          <h1 id="objectName" class="objectName">{{ objectNameText }}</h1>
 
-        <div v-if="scoreText" class="smallMeta">{{ scoreText }}</div>
+          <button class="mainButton startButton continueButton" type="button" @click="goToNextScreen">
+            Continue
+          </button>
+
+          <button class="mainButton secondaryButton tryAgainButton" type="button" @click="goBackToCapture">
+            Try again
+          </button>
+
+          <div v-if="confidenceText" class="smallMeta">{{ confidenceText }}</div>
+        </div>
       </div>
     </section>
   </main>
@@ -34,58 +42,44 @@
 
 <script setup>
 import { computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 
-/**
- * Router state expected:
- *  - imageDataUrl: string (data:image/..)
- *  - label: string (e.g. "cup")
- *  - score: number (0..1) optional
- */
-const route = useRoute();
 const router = useRouter();
 
-const state = computed(() => route.state ?? {});
-const capturedImageUrl = computed(() => state.value.imageDataUrl ?? "");
-const detectedLabel = computed(() => state.value.label ?? "");
-const detectedScore = computed(() => {
-  const raw = state.value.score;
-  return typeof raw === "number" && Number.isFinite(raw) ? raw : null;
+/**
+ * We pass data using router.push({ state: { ... } }).
+ * The most reliable way to read it is window.history.state.
+ */
+const navigationState = computed(() => window.history.state || {});
+
+const capturedImageDataUrl = computed(() => navigationState.value.imageDataUrl || "");
+const detectedObjectLabel = computed(() => navigationState.value.label || "");
+const detectedObjectScore = computed(() => {
+  const score = navigationState.value.score;
+  return typeof score === "number" ? score : null;
 });
 
-const uiText = computed(() => {
-  const lang = route.params?.lang; // not used now, kept simple
-  // You already have a global language state; for now keep English labels minimal.
-  return {
-    continue: "Continue",
-    tryAgain: "Try again",
-  };
+const objectNameText = computed(() => {
+  if (!detectedObjectLabel.value) return "Result";
+  return detectedObjectLabel.value.charAt(0).toUpperCase() + detectedObjectLabel.value.slice(1);
 });
 
-const titleText = computed(() => {
-  // Minimal: just the object name, or fallback text
-  if (!detectedLabel.value) return "Result";
-  // Capitalize first letter
-  return detectedLabel.value.charAt(0).toUpperCase() + detectedLabel.value.slice(1);
+const confidenceText = computed(() => {
+  if (detectedObjectScore.value == null) return "";
+  return `Confidence: ${Math.round(detectedObjectScore.value * 100)}%`;
 });
 
-const scoreText = computed(() => {
-  if (detectedScore.value == null) return "";
-  const percent = Math.round(detectedScore.value * 100);
-  return `Confidence: ${percent}%`;
-});
-
-const capturedBgStyle = computed(() => ({
-  backgroundImage: capturedImageUrl.value ? `url("${capturedImageUrl.value}")` : "none",
+const backgroundImageStyle = computed(() => ({
+  backgroundImage: capturedImageDataUrl.value ? `url("${capturedImageDataUrl.value}")` : "none",
 }));
 
-function tryAgain() {
+function goBackToCapture() {
   router.push("/capture");
 }
 
-function continueFlow() {
-  // Next: themes/prompts screen
-  router.push("/list"); // placeholder until you add the theme screen route
+function goToNextScreen() {
+  // Next step will be themes/prompts. For now we keep your existing placeholder.
+  router.push("/list");
 }
 </script>
 
@@ -97,13 +91,12 @@ function continueFlow() {
   overflow: hidden;
 }
 
-/* Make the blur stronger for result screen background */
 .strongBlur {
-  filter: blur(22px) !important;
+  filter: blur(24px) !important;
   opacity: 0.35 !important;
 }
 
-.centerArea {
+.contentArea {
   position: relative;
   z-index: 2;
   height: 100%;
@@ -112,10 +105,13 @@ function continueFlow() {
   padding: clamp(16px, 4vw, 48px);
 }
 
-/* Glass card */
+/* Glass card layout: circle on left, text center/right */
 .resultCard {
-  width: min(820px, 92vw);
-  text-align: center;
+  width: min(980px, 92vw);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: clamp(16px, 3vw, 28px);
+  align-items: center;
 
   padding: clamp(16px, 2.6vw, 28px);
   border-radius: 22px;
@@ -126,40 +122,49 @@ function continueFlow() {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.38);
 }
 
-.resultTitle {
+/* Circle preview */
+.circlePreview {
+  width: clamp(120px, 22vw, 220px);
+  height: clamp(120px, 22vw, 220px);
+  border-radius: 999px;
+  overflow: hidden;
+
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  display: grid;
+  place-items: center;
+}
+
+.circleImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.circleFallback {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.resultText {
+  text-align: center;
+}
+
+.objectName {
   margin: 0;
   font-size: clamp(34px, 5.2vw, 72px);
   line-height: 1.04;
   text-shadow: 0 12px 34px rgba(0, 0, 0, 0.65);
 }
 
-/* Captured preview */
-.previewFrame {
-  margin: clamp(14px, 2.8vw, 22px) auto 0 auto;
-  width: min(640px, 92vw);
-  border-radius: 18px;
-  overflow: hidden;
-
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+.continueButton {
+  margin-top: 16px;
 }
 
-.previewImage {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.previewFallback {
-  padding: 24px;
-  opacity: 0.85;
-}
-
-.buttonGroup {
-  margin: clamp(14px, 2.6vw, 22px) auto 0 auto;
-  display: grid;
-  gap: 12px;
-  width: min(560px, 92vw);
+.tryAgainButton {
+  margin-top: 10px;
 }
 
 .smallMeta {
@@ -168,5 +173,18 @@ function continueFlow() {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   opacity: 0.78;
+}
+
+/* Mobile: stack vertically */
+@media (max-width: 640px) {
+  .resultCard {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .resultText {
+    width: 100%;
+  }
 }
 </style>
