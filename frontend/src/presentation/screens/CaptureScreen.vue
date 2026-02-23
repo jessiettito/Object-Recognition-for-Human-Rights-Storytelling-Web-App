@@ -24,6 +24,23 @@
         <button class="mainButton homeButton" type="button" @click="goHome">
           {{ screenText.home }}
         </button>
+
+        <label class="uploadButton">
+          Upload image (test)
+          <input
+            class="hiddenInput"
+            type="file"
+            accept="image/*"
+            @change="onTestImageUpload"
+            :disabled="isRunningDetection"
+          />
+        </label>
+
+        <img ref="hiddenImageForDetection" class="hiddenPreview" alt="" />
+
+        <div v-if="detectionErrorMessage" class="errorText">
+          {{ detectionErrorMessage }}
+        </div>
       </div>
 
       <!-- Permission modal -->
@@ -63,6 +80,7 @@ import { useRouter } from "vue-router";
 
 import cmhrExteriorPhoto from "../../assets/backgrounds/CMHR_exterior.jpg";
 import cmhrInteriorPhoto from "../../assets/backgrounds/CMHR_interior.jpg";
+import { detectMainObject } from "../../logic/ObjectDetection.js";
 
 const props = defineProps({
   appTitle: { type: String, default: "Human Rights Object Stories" },
@@ -72,9 +90,9 @@ const props = defineProps({
 
 const router = useRouter();
 
+const showPermissionModal = ref(true);
 
 //Show permission modal 
-const showPermissionModal = ref(true);
 
 function goHome() {
   router.push("/");
@@ -88,9 +106,65 @@ function simulatePermissionYes() {
   showPermissionModal.value = false;
 }
 
+const hiddenImageForDetection = ref(null);
+const isRunningDetection = ref(false);
+const detectionErrorMessage = ref("");
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const fileReader = new FileReader();
+    fileReader.onerror = () => reject(new Error("Could not read the image file."));
+    fileReader.onload = () => resolve(fileReader.result);
+    fileReader.readAsDataURL(file);
+  });
+}
+
+function waitForImageToLoad(imageElement, dataUrl) {
+  return new Promise((resolve, reject) => {
+    imageElement.onload = () => resolve();
+    imageElement.onerror = () => reject(new Error("Could not load the image for detection."));
+    imageElement.src = dataUrl;
+  });
+}
+
+async function onTestImageUpload(event) {
+  detectionErrorMessage.value = "";
+  const selectedFile = event.target.files?.[0];
+  if (!selectedFile) return;
+
+  try {
+    isRunningDetection.value = true;
+
+    const imageDataUrl = await readFileAsDataUrl(selectedFile);
+
+    const imageElement = hiddenImageForDetection.value;
+    if (!imageElement) throw new Error("Hidden image element is not ready.");
+
+    await waitForImageToLoad(imageElement, imageDataUrl);
+
+    const detected = await detectMainObject(imageElement);
+    const detectedName = detected?.name ?? "unknown";
+    const detectedConfidence = detected?.confidence ?? 0;
+
+    router.push({
+      path: "/result",
+      state: {
+        imageDataUrl,
+        label: detectedName,
+        score: detectedConfidence,
+      },
+    });
+  } catch (error) {
+    detectionErrorMessage.value = error?.message ?? "Something went wrong during detection.";
+  } finally {
+    isRunningDetection.value = false;
+    event.target.value = ""; // lets you upload the same file again
+  }
+}
+
 const textByLanguage = {
   en: {
-    permissionTitle: "Use camera?",
+    permissionTitle: "Use camera? ",
     permissionBody: "We only use it to scan your object.",
     allowCamera: "Allow camera",
     chooseObject: "Choose from list",
