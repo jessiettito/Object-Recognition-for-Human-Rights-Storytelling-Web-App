@@ -1,36 +1,38 @@
 <template>
-   <!-- Main title -->
-  <header>
-    <h1 class="title">Explore Topics</h1>
-  </header>
+  <main class="page">
+    <!-- Main title -->
+    <header class="header">
+      <h1 class="title">Explore Topics</h1>
+    </header>
 
-  <div class="lists-wrapper">
-
-    <!-- Objects list -->
-    <div class="list-card">
-      <h2 class="list-title">Objects</h2>
-      <div class="scroll-list">
-        <div v-for="item in objects" :key="item" class="item">
-          {{ item.name }}
+    <!-- Lists -->
+    <div class="lists-wrapper">
+      <!-- Objects list -->
+      <div class="list-card">
+        <h2 class="list-title">Objects</h2>
+        <div class="scroll-list">
+          <div v-for="item in objects" :key="item" class="item">
+            {{ item.name }}
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Topics list -->
-    <div class="list-card">
-      <h2 class="list-title">Topics</h2>
-      <div class="scroll-list"> 
-        <div v-for="item in topics" :key="item" class="item">
-          {{ item.name }}
+      <!-- Topics list -->
+      <div class="list-card">
+        <h2 class="list-title">Topics</h2>
+        <div class="scroll-list"> 
+          <div v-for="item in topics" :key="item" class="item">
+            {{ item.name }}
+          </div>
         </div>
       </div>
+
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup>
-import { openBlock, ref } from 'vue'
-const items = ref([])
+import { ref } from 'vue'
 
 /* Mock data */
 const objects = ref(
@@ -52,7 +54,9 @@ const topics = ref(
 .page {
   min-height: 100vh;
   padding: 40px 5vw;
-  background: #f7f9fc;
+  background: #05060a;
+  color: white;
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -60,27 +64,29 @@ const topics = ref(
 
 .header {
   margin-bottom: 40px;
+  text-align: center;
 }
 
 .title {
-  margin: 0;
-  font-size: 2rem;
+  font-size: clamp(28px, 4vw, 52px);
   font-weight: 600;
+  margin: 0;
 }
 
 .lists-wrapper {
   width: 100%;
+  max-width: 1100px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 40px;
-  max-width: 1100px;
 }
 
 .list-card {
-  background: white;
-  border-radius: 18px;
-  padding: 20px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  border-radius: 22px;
+  padding: 24px;
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.4);
   display: flex;
   flex-direction: column;
   height: 70vh;
@@ -88,29 +94,27 @@ const topics = ref(
 
 .list-title {
   text-align: center;
-  margin-bottom: 15px;
+  margin-bottom: 18px;
   font-size: 1.3rem;
-
 }
 
 .scroll-list {
   flex: 1;
   overflow-y: auto;
-  border-radius: 12px;
-  padding-right: 6px;
+  padding-right: 8px;
 }
 
 .item {
-  padding: 12px;
-  border-radius: 10px;
-  margin-bottom: 8px;
-  background: #f1f5fb;
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.06);
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .item:hover {
   transform: translateY(-2px);
-  background: #e6eefc;
+  background: rgba(255, 255, 255, 0.12);
 }
 </style>
