@@ -48,7 +48,6 @@ const topics = ref(
 )
 </script>
 
-
 <style scoped>
 .page {
   min-height: 100vh;
@@ -93,7 +92,6 @@ const topics = ref(
   font-size: 1.3rem;
 
 }
-
 
 .scroll-list {
   flex: 1;
