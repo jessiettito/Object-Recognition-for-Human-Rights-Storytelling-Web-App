@@ -1,4 +1,5 @@
 <template>
+
   <main class="captureScreen" role="main" aria-label="Capture screen">
     <div class="backgroundLayers" aria-hidden="true">
       <div class="backgroundPhoto" :style="backgroundStyle"></div>
@@ -8,12 +9,30 @@
 
     <!-- Main camera UI -->
     <section class="mainArea" aria-label="Camera area">
-      <div class="cameraFrame" role="img" aria-label="Camera preview placeholder">
+      <!-- <div class="cameraFrame" role="img" aria-label="Camera preview placeholder">
         <div class="cameraHint">{{ screenText.previewHint }}</div>
+      </div> -->
+
+      <!-- Camera preview -->
+      <div class="cameraFrame">
+        <video
+          ref="video"
+          autoplay
+          playsinline
+          class="cameraVideo">
+        </video>
+        <div v-if="!cameraStarted" class="cameraHint">
+          {{ screenText.previewHint }}
       </div>
 
+</div>
+
       <div class="bottomControls" aria-label="Camera controls">
-        <button class="mainButton captureButton" type="button" :disabled="showPermissionModal">
+        <button
+          class="mainButton captureButton"
+          type="button"
+          :disabled="showPermissionModal || !cameraStarted"
+          @click="capturePhoto">
           {{ screenText.captureButton }}
         </button>
 
@@ -39,10 +58,10 @@
           <p class="modalBody">{{ screenText.permissionBody }}</p>
 
           <div class="modalButtons">
-            <button class="mainButton startButton" type="button" @click="simulatePermissionYes">
+            <button class="mainButton startButton" type="button" @click="startCamera">
               {{ screenText.allowCamera }}
             </button>
-
+            
             <button class="mainButton secondaryButton" type="button" @click="goToList">
               {{ screenText.chooseObject }}
             </button>
@@ -53,12 +72,15 @@
           </div>
         </div>
       </div>
+
+      <canvas ref="canvas" style="display:none"></canvas>
+
     </section>
   </main>
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 
 import cmhrExteriorPhoto from "../../assets/backgrounds/CMHR_exterior.jpg";
@@ -76,6 +98,67 @@ const router = useRouter();
 //Show permission modal 
 const showPermissionModal = ref(true);
 
+const video = ref(null)
+const canvas = ref(null)
+
+let stream = null
+const cameraStarted = ref(false)
+const capturedPhoto = ref(null)
+const showResultModal = ref(false)
+
+/* Camera */
+async function startCamera() {
+
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: true
+
+    })
+
+    video.value.srcObject = stream
+    cameraStarted.value = true
+    showPermissionModal.value = false
+
+  } catch (err) {
+    alert("Camera access failed. Please allow camera permission.")
+    console.error(err)
+  }
+}
+
+/* Capture snapshot */
+function capturePhoto() {
+  if (!video.value || !canvas.value) return
+
+  const canvasEl = canvas.value
+  const videoEl = video.value
+
+  const ctx = canvas.value.getContext("2d")
+
+  canvas.value.width = video.value.videoWidth
+  canvas.value.height = video.value.videoHeight
+
+  // Mirror snapshot to match preview
+  ctx.save()
+  ctx.scale(-1, 1)
+  ctx.drawImage(
+    videoEl,
+    -canvasEl.width,
+    0,
+    canvasEl.width,
+    canvasEl.height
+  )
+  ctx.restore()
+
+  capturedPhoto.value = canvasEl.toDataURL("image/png")
+
+ 
+  // Show result window
+  showResultModal.value = true
+
+  return photo
+}
+
+/* Navigation */
 function goHome() {
   router.push("/");
 }
@@ -83,6 +166,13 @@ function goHome() {
 function goToList() {
   router.push("/list");
 }
+
+/* Cleanup */
+onUnmounted(() => {
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop())
+  }
+})
 
 function simulatePermissionYes() {
   showPermissionModal.value = false;
@@ -227,5 +317,13 @@ const backgroundStyle = computed(() => ({
   display: grid;
   gap: 12px;
   width: min(560px, 92vw);
+}
+
+.cameraVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 18px;
+  transform: scaleX(-1); /* Flips the camera horizontally */
 }
 </style>
