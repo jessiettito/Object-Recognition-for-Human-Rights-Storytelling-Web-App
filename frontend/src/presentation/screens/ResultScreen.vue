@@ -1,4 +1,3 @@
-<!-- frontend/src/presentation/screens/ResultScreen.vue -->
 <template>
   <main class="resultScreen" role="main" aria-label="Result screen">
     <!-- Captured image as blurred background -->
@@ -48,7 +47,6 @@ const router = useRouter();
 
 /**
  * We pass data using router.push({ state: { ... } }).
- * The most reliable way to read it is window.history.state.
  */
 const navigationState = computed(() => window.history.state || {});
 
@@ -78,7 +76,7 @@ function goBackToCapture() {
 }
 
 function goToNextScreen() {
-  // Next step will be themes/prompts. For now we keep your existing placeholder.
+  // As of now moving to the list screen **** we will adding the theme screen here. *** for myself reminder...
   router.push("/list");
 }
 </script>
@@ -91,6 +89,7 @@ function goToNextScreen() {
   overflow: hidden;
 }
 
+/* Background layers: photo, blurred photo, dark overlay */
 .strongBlur {
   filter: blur(24px) !important;
   opacity: 0.35 !important;
@@ -105,7 +104,7 @@ function goToNextScreen() {
   padding: clamp(16px, 4vw, 48px);
 }
 
-/* Glass card layout: circle on left, text center/right */
+/* Glass card layout: circle on left, text center on the right side */
 .resultCard {
   width: min(980px, 92vw);
   display: grid;
