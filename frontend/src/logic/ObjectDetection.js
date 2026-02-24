@@ -55,6 +55,7 @@ function getBestPrediction(predictions) {
  * @returns {Promise<{name: string, confidence: number} | null>}
  */
 export async function detectMainObject(imageElement) {
+  await initializeBackendIfNeeded();
   const model = await loadModelIfNeeded();
   const predictions = await model.detect(imageElement);
 
