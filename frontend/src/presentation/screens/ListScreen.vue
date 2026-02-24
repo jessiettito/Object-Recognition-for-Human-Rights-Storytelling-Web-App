@@ -1,15 +1,23 @@
 <template>
-  <main class="page">
+  <main class="page" role="main" aria-label="Explore topics screen">
+
+    <!-- Background layers -->
+    <div class="backgroundLayers" aria-hidden="true">
+      <div class="backgroundPhoto" :style="backgroundStyle"></div>
+      <div class="backgroundPhotoBlur" :style="backgroundStyle"></div>
+      <div class="backgroundDarkenOverlay"></div>
+    </div>
+
     <!-- Main title -->
     <header class="header">
-      <h1 class="title">Explore Topics</h1>
+      <h1 class="title">{{ screenText.title }}</h1>
     </header>
 
     <!-- Lists -->
     <div class="lists-wrapper">
       <!-- Objects list -->
       <div class="list-card">
-        <h2 class="list-title">Objects</h2>
+        <h2 class="list-title">{{ screenText.objects }}</h2>
         <div class="scroll-list">
           <div v-for="item in objects" :key="item" class="item">
             {{ item.name }}
@@ -19,7 +27,7 @@
 
       <!-- Topics list -->
       <div class="list-card">
-        <h2 class="list-title">Topics</h2>
+        <h2 class="list-title">{{ screenText.topics }}</h2>
         <div class="scroll-list"> 
           <div v-for="item in topics" :key="item" class="item">
             {{ item.name }}
@@ -32,7 +40,28 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+
+const props = defineProps({
+  language: { type: String, default: "en" }
+})
+
+const textByLanguage = {
+  en: {
+    title: "Explore Topics",
+    objects: "Objects",
+    topics: "Topics"
+  },
+  fr: {
+    title: "Explorer les sujets",
+    objects: "Objets",
+    topics: "Sujets"
+  }
+};
+
+const screenText = computed(() =>
+  props.language === "fr" ? textByLanguage.fr : textByLanguage.en
+)
 
 /* Mock data */
 const objects = ref(
@@ -53,37 +82,51 @@ const topics = ref(
 <style scoped>
 .page {
   min-height: 100vh;
-  padding: 40px 5vw;
-  background: #05060a;
-  color: white;
-
+  position: relative;
+  overflow: hidden;
+  padding: clamp(20px, 3vw, 50px);
   display: flex;
   flex-direction: column;
   align-items: center;
+  background: #07070a;
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .header {
-  margin-bottom: 40px;
+  margin-bottom: clamp(24px, 4vw, 40px);
   text-align: center;
+  position: relative;
+  z-index: 2;
 }
 
 .title {
-  font-size: clamp(28px, 4vw, 52px);
-  font-weight: 600;
   margin: 0;
+  font-size: clamp(32px, 5vw, 72px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-shadow: 0 12px 34px rgba(0, 0, 0, 0.65);
 }
 
 .lists-wrapper {
   width: 100%;
-  max-width: 1100px;
+  max-width: 1200px;
+  padding: 0 20px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 40px;
+  gap: 50px;
+  grid-template-columns: 1fr;
+  flex: 1;
+  align-items: stretch;
+}
+/* Side-by-side on tablets and up */
+@media (min-width: 700px) {
+  .lists-wrapper {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .list-card {
-  background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 22px;
   padding: 24px;
   box-shadow: 0 22px 70px rgba(0, 0, 0, 0.4);
