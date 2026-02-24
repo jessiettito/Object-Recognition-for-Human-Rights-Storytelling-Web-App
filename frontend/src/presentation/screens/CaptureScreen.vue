@@ -354,6 +354,8 @@ const backgroundStyle = computed(() => ({
 .cameraVideo {
   width: 100%;
   height: 100%;
+  position: relative;
+  overflow : hidden;
   object-fit: cover;
   border-radius: 18px;
   transform: scaleX(-1); /* Flips the camera horizontally */
