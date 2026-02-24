@@ -39,6 +39,24 @@
         <button class="mainButton homeButton" type="button" @click="goHome">
           {{ screenText.home }}
         </button>
+
+        <!-- *** Temporary upload button for testing object detection without using the camera. Will be removed later. *** -->
+        <label class="uploadButton">
+          Upload image (test)
+          <input
+            class="hiddenInput"
+            type="file"
+            accept="image/*"
+            @change="onImageUpload"
+            :disabled="isRunningDetection"
+          />
+        </label>
+
+        <img ref="hiddenImageForDetection" class="hiddenPreview" alt="" />
+
+        <div v-if="detectionErrorMessage" class="errorText">
+          {{ detectionErrorMessage }}
+        </div>
       </div>
 
       <!-- Permission modal -->
@@ -47,7 +65,8 @@
         class="modalOverlay"
         role="dialog"
         aria-modal="true"
-        aria-label="Camera permission prompt">
+        aria-label="Camera permission prompt"
+      >
         <div class="modalCard">
           <h1 class="modalTitle">{{ screenText.permissionTitle }}</h1>
           <p class="modalBody">{{ screenText.permissionBody }}</p>
@@ -68,28 +87,6 @@
         </div>
       </div>
 
-    <!-- Result window -->
-    <div 
-      v-if="showResultModal" class="modalOverlay">
-      <div class="modalCard resultCard">
-        <h1 class="modalTitle">We detected an object!</h1>
-        <p class="modalBody">This is a placeholder message. Detection algorithm is not connected yet.</p>
-
-        <div class="snapshotPreview">
-          <img :src="capturedPhoto" alt="Snapshot preview" />
-        </div>
-
-        <div class="modalButtons">
-          <button class="mainButton startButton" @click="retakePhoto">
-            Take another picture
-          </button>
-          <button class="mainButton secondaryButton" @click="goToList">
-            Read about object
-          </button>
-        </div>
-      </div>
-    </div>
-
       <canvas ref="canvas" style="display:none"></canvas>
 
     </section>
@@ -102,6 +99,7 @@ import { useRouter } from "vue-router";
 
 import cmhrExteriorPhoto from "../../assets/backgrounds/CMHR_exterior.jpg";
 import cmhrInteriorPhoto from "../../assets/backgrounds/CMHR_interior.jpg";
+import { detectMainObject } from "../../logic/ObjectDetection.js";
 
 const props = defineProps({
   appTitle: { type: String, default: "Human Rights Object Stories" },
@@ -112,15 +110,18 @@ const props = defineProps({
 const router = useRouter();
 
 //Show permission modal 
-const showPermissionModal = ref(true);
+const showPermissionModal = ref(true); 
 
-const video = ref(null)
-const canvas = ref(null)
+const video = ref(null); 
+const canvas = ref(null);
 
-let stream = null
-const cameraStarted = ref(false)
-const capturedPhoto = ref(null)
-const showResultModal = ref(false)
+let stream = null; 
+const cameraStarted = ref(false);
+
+const capturedPhoto = ref(null);
+const hiddenImageForDetection = ref(null);
+const isRunningDetection = ref(false);
+const detectionErrorMessage = ref("");
 
 /* Camera */
 async function startCamera() {
@@ -142,38 +143,44 @@ async function startCamera() {
 }
 
 /* Capture snapshot */
-function capturePhoto() {
+async function capturePhoto() {
   if (!video.value || !canvas.value) return
+  detectionErrorMessage.value = ""; 
 
-  const canvasEl = canvas.value
-  const videoEl = video.value
-  const ctx = canvas.value.getContext("2d")
+  try { 
+    isRunningDetection.value = true;
 
-  canvas.value.width = video.value.videoWidth
-  canvas.value.height = video.value.videoHeight
+    const canvasEl = canvas.value
+    const videoEl = video.value
+    const ctx = canvasEl.getContext("2d")
 
-  // Mirror snapshot to match preview
-  ctx.save()
-  ctx.scale(-1, 1)
-  ctx.drawImage(
-    videoEl,
-    -canvasEl.width,
-    0,
-    canvasEl.width,
-    canvasEl.height
-  )
-  ctx.restore()
+    canvasEl.width = videoEl.videoWidth
+    canvasEl.height = videoEl.videoHeight
 
-  capturedPhoto.value = canvasEl.toDataURL("image/png")
+    // Mirror snapshot to match preview
+    ctx.save()
+    ctx.scale(-1, 1)
+    ctx.drawImage(
+      videoEl,
+      -canvasEl.width,
+      0,
+      canvasEl.width,
+      canvasEl.height
+    )
+    ctx.restore()
 
- 
-  // Show result window
-  showResultModal.value = true
-  console.log("Captured photo stored")
+    capturedPhoto.value = canvasEl.toDataURL("image/png")
+
+    await runDetectionFromDataUrl(capturedPhoto.value); 
+  } catch (error) {
+    detectionErrorMessage.value = error?.message ?? "Something went wrong during detection."
+  } finally {
+    // Stop the camera stream after capturing
+    isRunningDetection.value = false;
+  }
 }
 
 async function retakePhoto() {
-  showResultModal.value = false
   capturedPhoto.value = null
 
   try {
@@ -210,9 +217,77 @@ onUnmounted(() => {
   }
 })
 
+// this is to remind myself...
+// Helper function for file upload testing (will be removed later)..
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const fileReader = new FileReader();
+    fileReader.onerror = () => reject(new Error("Could not read the image file."));
+    fileReader.onload = () => resolve(fileReader.result);
+    fileReader.readAsDataURL(file);
+  });
+}
+
+/**
+ * Waits for the image element to load the given data URL, or rejects if it fails to load.
+ * @param imageElement 
+ * @param dataUrl 
+ */
+function waitForImageToLoad(imageElement, dataUrl) {
+  return new Promise((resolve, reject) => {
+    imageElement.onload = () => resolve();
+    imageElement.onerror = () => reject(new Error("Could not load the image for detection."));
+    imageElement.src = dataUrl;
+  });
+}
+
+/**
+ * Runs object detection on the given image data URL, then navigates to the result screen with the detection data.
+ * @param imageDataUrl 
+ */
+async function runDetectionFromDataUrl(imageDataUrl) {
+  const imageElement = hiddenImageForDetection.value;
+  if (!imageElement) throw new Error("Hidden image element is not ready.");
+
+  await waitForImageToLoad(imageElement, imageDataUrl);
+
+  const detected = await detectMainObject(imageElement);
+  const detectedName = detected?.name ?? "unknown";
+  const detectedConfidence = detected?.confidence ?? 0;
+
+  router.push({
+    path: "/result",
+    state: {
+      imageDataUrl,
+      label: detectedName,
+      score: detectedConfidence,
+    },
+  });
+}
+
+// this is to remind myself...
+// This is just a test function to allow uploading an image file instead of using the camera. *** will be removd after meeting or testing. 
+async function onImageUpload(event) {
+  detectionErrorMessage.value = "";
+  const selectedFile = event.target.files?.[0];
+  if (!selectedFile) return;
+
+  try {
+    isRunningDetection.value = true;
+    const imageDataUrl = await readFileAsDataUrl(selectedFile);
+    await runDetectionFromDataUrl(imageDataUrl);
+  } catch (error) {
+    detectionErrorMessage.value = error?.message ?? "Something went wrong during detection.";
+  } finally {
+    isRunningDetection.value = false;
+    event.target.value = "";
+  }
+}
+
+/* Computed properties for text and styles */
 const textByLanguage = {
   en: {
-    permissionTitle: "Use camera?",
+    permissionTitle: "Use camera? ",
     permissionBody: "We only use it to scan your object.",
     allowCamera: "Allow camera",
     chooseObject: "Choose from list",
