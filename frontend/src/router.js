@@ -2,13 +2,15 @@ import { createRouter, createWebHistory } from 'vue-router'
 import WelcomeScreen from './presentation/screens/WelcomeScreen.vue'
 import CaptureScreen from "./presentation/screens/CaptureScreen.vue";
 import ResultScreen from "./presentation/screens/ResultScreen.vue";
-import ListScreen from './presentation/screens/ListScreen.vue'
+import ListScreen from './presentation/screens/ListScreen.vue';
+import ThemesScreen from './presentation/screens/ThemesScreen.vue';
 
 const routes = [
   { path: '/', component: WelcomeScreen },
   { path: "/capture", component: CaptureScreen },
   { path: '/list', component: ListScreen },
-  { path: '/result', component: ResultScreen }
+  { path: '/result', component: ResultScreen },
+  { path: '/themes', component: ThemesScreen }
 ]
 
 const router = createRouter({
