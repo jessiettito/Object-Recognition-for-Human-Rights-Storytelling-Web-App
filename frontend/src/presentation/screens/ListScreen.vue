@@ -1,13 +1,6 @@
 <template>
   <main class="page" role="main" aria-label="Explore topics screen">
 
-    <!-- Background layers -->
-    <div class="backgroundLayers" aria-hidden="true">
-      <div class="backgroundPhoto" :style="backgroundStyle"></div>
-      <div class="backgroundPhotoBlur" :style="backgroundStyle"></div>
-      <div class="backgroundDarkenOverlay"></div>
-    </div>
-
     <!-- Main title -->
     <header class="header">
       <div class = "headerTop">
@@ -29,7 +22,7 @@
       <section class="list-card">
         <h2 class="list-title">{{ screenText.objects }}</h2>
         <div class="scroll-list" role = "list">
-          <button v-for="item in objects" :key="item" class="item" type="button" @click="selectObject(item)">
+          <button v-for="item in objects" :key="item.id" class="item" type="button" @click="selectObject(item)">
             <span class = "listItemText">{{ item.name }}</span>
             <span class="chev" aria-hidden="true">›</span>
           </button>
@@ -40,7 +33,7 @@
       <section class="list-card">
         <h2 class="list-title">{{ screenText.topics }}</h2>
         <div class="scroll-list" role = "list"> 
-          <button v-for="item in topics" :key="item" class="item" type ="button" @click = "selectTopic(item)">
+          <button v-for="item in topics" :key="item.id" class="item" type ="button" @click = "selectTopic(item)">
             <span class = "listItemText">{{ item.name }}</span>
             <span class="chev" aria-hidden="true">›</span>
           </button>
@@ -52,7 +45,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   language: { type: String, default: "en" }
@@ -154,20 +148,17 @@ function selectTopic(item) {
   });
 }
 
-/* Mock data */
-
 </script>
 
 <style scoped>
 .page {
-  min-height: 100vh;
-  position: relative;
-  overflow: hidden;
+  height: 100vh;          
+  overflow: hidden;       
   padding: clamp(20px, 3vw, 50px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #07070a;
+  background: #26a0bb;
   color: rgba(255, 255, 255, 0.92);
 }
 
@@ -207,8 +198,10 @@ function selectTopic(item) {
   gap: 50px;
   grid-template-columns: 1fr;
   flex: 1;
+  min-height: 0;     
   align-items: stretch;
 }
+
 /* Side-by-side on tablets and up */
 @media (min-width: 700px) {
   .lists-wrapper {
@@ -224,7 +217,8 @@ function selectTopic(item) {
   box-shadow: 0 22px 70px rgba(0, 0, 0, 0.4);
   display: flex;
   flex-direction: column;
-  height: 70vh;
+  height: 100%;      
+  min-height: 0;     
 }
 
 .list-title {
@@ -235,6 +229,7 @@ function selectTopic(item) {
 
 .scroll-list {
   flex: 1;
+  min-height: 0;     
   overflow-y: auto;
   padding-right: 10px;
   display: flex;
@@ -242,23 +237,8 @@ function selectTopic(item) {
   gap: 12px;
 }
 
-.listRow {
-  display: block;             
-  width: 100%;                
-  padding: 16px 16px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: rgba(255, 255, 255, 0.95);
-  font-size: 24px;
-  font-weight: 750;
-  text-align: left;
-  cursor: pointer;
-  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
-}
-
 .listItemText {
-  font-size: 20px;        /* try 20–24 */
+  font-size: 20px;        
   font-weight: 700;
   line-height: 1.2;
 }
@@ -271,33 +251,6 @@ function selectTopic(item) {
 
 .listRow:active {
   transform: translateY(0px);
-}
-
-/* Inner layout */
-.rowText {
-  display: inline-block;
-  max-width: 92%;
-  line-height: 1.2;
-}
-
-.rowChevron {
-  float: right;
-  opacity: 0.75;
-  font-size: 22px;
-  margin-left: 12px;
-}
-
-/* Optional scrollbar visibility */
-.scroll-list::-webkit-scrollbar {
-  width: 10px;
-}
-.scroll-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-}
-.scroll-list::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 999px;
 }
 
 .item {
