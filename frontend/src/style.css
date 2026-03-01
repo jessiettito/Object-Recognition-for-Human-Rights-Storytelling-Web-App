@@ -54,40 +54,6 @@ body {
   color: rgba(255, 255, 255, 0.92);
 }
 
-/* Shared background layers */
-.backgroundLayers {
-  position: absolute;
-  inset: 0;
-}
-
-.backgroundPhoto,
-.backgroundPhotoBlur {
-  background-size: cover;
-  background-position: center 30%;
-}
-
-.backgroundPhoto {
-  position: absolute;
-  inset: 0;
-  transform: scale(1.02);
-}
-
-.backgroundPhotoBlur {
-  position: absolute;
-  inset: 0;
-  transform: scale(1.08);
-  filter: blur(10px);
-  opacity: 0.12;
-}
-
-.backgroundDarkenOverlay {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(900px 600px at 50% 35%, rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.30)),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.10) 0%, rgba(0, 0, 0, 0.34) 85%);
-}
-
 /* Shared top header bar*/
 .topBar {
   position: relative;

@@ -1,11 +1,5 @@
 <template>
   <main class="captureScreen" role="main" aria-label="Capture screen">
-    <div class="backgroundLayers" aria-hidden="true">
-      <div class="backgroundPhoto" :style="backgroundStyle"></div>
-      <div class="backgroundPhotoBlur" :style="backgroundStyle"></div>
-      <div class="backgroundDarkenOverlay"></div>
-    </div>
-
     <!-- Main camera UI -->
     <section class="mainArea" aria-label="Camera area">
 
@@ -97,13 +91,10 @@
 import { computed, ref, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 
-import cmhrExteriorPhoto from "../../assets/backgrounds/CMHR_exterior.jpg";
-import cmhrInteriorPhoto from "../../assets/backgrounds/CMHR_interior.jpg";
 import { detectMainObject } from "../../logic/ObjectDetection.js";
 
 const props = defineProps({
   appTitle: { type: String, default: "Human Rights Object Stories" },
-  backgroundName: { type: String, default: "CMHR_interior.jpg" },
   language: { type: String, default: "en" },
 });
 
@@ -308,16 +299,6 @@ const textByLanguage = {
 
 const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr : textByLanguage.en));
 
-const backgroundPhotoByName = {
-  "CMHR_exterior.jpg": cmhrExteriorPhoto,
-  "CMHR_interior.jpg": cmhrInteriorPhoto,
-};
-
-const chosenBackground = computed(() => backgroundPhotoByName[props.backgroundName] ?? cmhrInteriorPhoto);
-
-const backgroundStyle = computed(() => ({
-  backgroundImage: `url("${chosenBackground.value}")`,
-}));
 </script>
 
 <style scoped>

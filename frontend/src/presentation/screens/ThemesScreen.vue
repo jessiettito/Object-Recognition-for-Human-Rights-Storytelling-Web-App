@@ -1,11 +1,6 @@
 <!-- frontend/src/presentation/screens/ThemesScreen.vue -->
 <template>
   <main class="themesScreen" role="main" aria-label="Themes screen">
-    <div class="backgroundLayers" aria-hidden="true">
-      <div class="backgroundPhoto" :style="backgroundImageStyle"></div>
-      <div class="backgroundPhotoBlur strongBlur" :style="backgroundImageStyle"></div>
-      <div class="backgroundDarkenOverlay"></div>
-    </div>
 
     <section class="contentArea" aria-labelledby="title">
       <div class="card">
@@ -83,10 +78,6 @@ const textByLanguage = {
 
 const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr : textByLanguage.en));
 
-const backgroundImageStyle = computed(() => ({
-  backgroundImage: imageDataUrl.value ? `url("${imageDataUrl.value}")` : "none",
-}));
-
 function goBack() {
   router.back();
 }
@@ -106,28 +97,6 @@ function goToList() {
   width: 100%;
   position: relative;
   overflow: hidden;
-}
-
-.backgroundLayers {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
-.backgroundPhoto,
-.backgroundPhotoBlur {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-}
-.strongBlur {
-  filter: blur(24px) !important;
-  opacity: 0.35 !important;
-}
-.backgroundDarkenOverlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
 }
 
 .contentArea {

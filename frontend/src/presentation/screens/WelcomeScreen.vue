@@ -1,12 +1,6 @@
 <template>
   <main class="welcomeScreen" role="main" aria-label="Welcome screen">
-    <div class="backgroundLayers" aria-hidden="true">
-      <div class="backgroundPhoto" :style="backgroundStyle"></div>
-      <div class="backgroundPhotoBlur" :style="backgroundStyle"></div>
-      <div class="backgroundDarkenOverlay"></div>
-    </div>
-
-    
+   
     <!-- Center content with welcome message and buttons -->
     <section class="centerArea" aria-labelledby="welcomeTitle">
       <div class="centerCard">
@@ -33,16 +27,8 @@ import { computed, ref } from "vue";
 import { useRouter } from 'vue-router'
 const router = useRouter();
 
-
-// Direct imports 
-import cmhrExteriorPhoto from "../../assets/backgrounds/CMHR_exterior.jpg";
-import cmhrInteriorPhoto from "../../assets/backgrounds/CMHR_interior.jpg";
-
 const props = defineProps({
   appTitle: { type: String, default: "Human Rights Object Stories" },
-
-  backgroundName: { type: String, default: "CMHR_exterior.jpg" },
-
   language: { type: String, default: "en" },
 });
 
@@ -63,18 +49,6 @@ const textByLanguage = {
 };
 
 const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr : textByLanguage.en));
-
-const backgroundPhotoByName = {
-  "CMHR_exterior.jpg": cmhrExteriorPhoto,
-  "CMHR_interior.jpg": cmhrInteriorPhoto,
-};
-
-const chosenBackgroundPhotoUrl = computed(() => backgroundPhotoByName[props.backgroundName] ?? cmhrExteriorPhoto);
-
-
-const backgroundStyle = computed(() => ({
-  backgroundImage: `url("${chosenBackgroundPhotoUrl.value}")`,
-}));
 
 //router control
 function startScan() {

@@ -1,11 +1,5 @@
 <template>
   <main class="resultScreen" role="main" aria-label="Result screen">
-    <!-- Captured image as blurred background -->
-    <div class="backgroundLayers" aria-hidden="true">
-      <div class="backgroundPhoto" :style="backgroundImageStyle"></div>
-      <div class="backgroundPhotoBlur strongBlur" :style="backgroundImageStyle"></div>
-      <div class="backgroundDarkenOverlay"></div>
-    </div>
 
     <section class="contentArea" aria-labelledby="objectName">
       <div class="resultCard">
