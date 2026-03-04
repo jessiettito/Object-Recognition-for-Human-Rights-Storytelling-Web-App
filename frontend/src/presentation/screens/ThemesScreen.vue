@@ -1,9 +1,9 @@
 <!-- frontend/src/presentation/screens/ThemesScreen.vue -->
 <template>
-  <main class="themesScreen" role="main" aria-label="Themes screen">
+  <main class="screen themesScreen" role="main" aria-label="Themes screen">
 
     <section class="contentArea" aria-labelledby="title">
-      <div class="card">
+      <div class="modalCard">
         <h1 id="title" class="title">{{ screenText.title }}</h1>
 
         <p class="body">
@@ -14,7 +14,7 @@
           <span class="pill">{{ selectionText }}</span>
         </div>
 
-        <div class="buttons">
+        <div class="modalButtons">
           <button class="mainButton startButton" type="button" @click="goBack">
             {{ screenText.back }}
           </button>
@@ -43,7 +43,6 @@ const props = defineProps({
 const router = useRouter();
 
 const navigationState = computed(() => window.history.state || {});
-const imageDataUrl = computed(() => navigationState.value.imageDataUrl || "");
 
 // coming from ListScreen click handlers (optional)
 const selectedType = computed(() => navigationState.value.type || "");
@@ -92,32 +91,6 @@ function goToList() {
 </script>
 
 <style scoped>
-.themesScreen {
-  height: 100%;
-  width: 100%;
-  position: relative;
-  overflow: hidden;
-}
-
-.contentArea {
-  position: relative;
-  z-index: 2;
-  height: 100%;
-  display: grid;
-  place-items: center;
-  padding: clamp(16px, 4vw, 48px);
-}
-
-.card {
-  width: min(980px, 92vw);
-  text-align: center;
-  padding: clamp(16px, 2.6vw, 28px);
-  border-radius: 22px;
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.38);
-}
 
 .title {
   margin: 0;
@@ -134,31 +107,5 @@ function goToList() {
 
 .selection {
   margin-top: 14px;
-}
-
-.pill {
-  display: inline-block;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.buttons {
-  margin: 18px auto 0 auto;
-  display: grid;
-  gap: 12px;
-  width: min(560px, 92vw);
-}
-
-.smallMeta {
-  margin-top: 14px;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.78;
 }
 </style>

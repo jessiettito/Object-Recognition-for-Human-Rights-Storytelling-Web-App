@@ -1,8 +1,8 @@
 <template>
-  <main class="resultScreen" role="main" aria-label="Result screen">
+  <main class=" screen resultScreen" role="main" aria-label="Result screen">
 
     <section class="contentArea" aria-labelledby="objectName">
-      <div class="resultCard">
+      <div class="resultCard panelCard">
         <!-- Circle preview on the side -->
         <div class="circlePreview" aria-label="Object preview">
           <img
@@ -61,10 +61,6 @@ const confidenceText = computed(() => {
   return `Confidence: ${Math.round(detectedObjectScore.value * 100)}%`;
 });
 
-const backgroundImageStyle = computed(() => ({
-  backgroundImage: capturedImageDataUrl.value ? `url("${capturedImageDataUrl.value}")` : "none",
-}));
-
 function goBackToCapture() {
   router.push("/capture");
 }
@@ -76,19 +72,6 @@ function goToNextScreen() {
 </script>
 
 <style scoped>
-.resultScreen {
-  height: 100%;
-  width: 100%;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Background layers: photo, blurred photo, dark overlay */
-.strongBlur {
-  filter: blur(24px) !important;
-  opacity: 0.35 !important;
-}
-
 .contentArea {
   position: relative;
   z-index: 2;

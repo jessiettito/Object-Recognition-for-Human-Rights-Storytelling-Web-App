@@ -152,14 +152,13 @@ function selectTopic(item) {
 
 <style scoped>
 .page {
-  height: 100vh;          
-  overflow: hidden;       
-  padding: clamp(20px, 3vw, 50px);
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  padding: clamp(16px, 2.5vw, 40px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #26a0bb;
-  color: rgba(255, 255, 255, 0.92);
 }
 
 .header {
@@ -243,23 +242,25 @@ function selectTopic(item) {
   line-height: 1.2;
 }
 
-.listRow:hover {
-  transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.22);
-}
-
-.listRow:active {
-  transform: translateY(0px);
-}
-
 .item {
-  padding: 14px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
   border-radius: 12px;
-  margin-bottom: 10px;
+
   background: rgba(255, 255, 255, 0.06);
-  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.95);
+
   cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.chev {
+  opacity: 0.75;
+  font-size: 22px;
 }
 
 .item:hover {

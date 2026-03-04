@@ -1,5 +1,5 @@
 <template>
-  <main class="welcomeScreen" role="main" aria-label="Welcome screen">
+  <main class="screen welcomeScreen" role="main" aria-label="Welcome screen">
    
     <!-- Center content with welcome message and buttons -->
     <section class="centerArea" aria-labelledby="welcomeTitle">
@@ -7,11 +7,11 @@
         <h1 id="welcomeTitle" class="welcomeTitle">{{ screenText.title }}</h1>
 
         <div class="buttonGroup">
-          <button class="mainButton startButton" type="button" @click="$router.push('/capture')">
+          <button class="mainButton startButton" type="button" @click="startScan">
             {{ screenText.startButtonText }}
           </button>
 
-          <button class="mainButton chooseButton" type="button" @click="$router.push('/list')">
+          <button class="mainButton chooseButton" type="button" @click="skipScan">
             {{ screenText.chooseButtonText }}
           </button>
         </div>
@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { useRouter } from 'vue-router'
 const router = useRouter();
 
@@ -62,15 +62,6 @@ function skipScan() {
 </script>
 
 <style scoped>
-.welcomeScreen {
-  height: 100%;
-  width: 100%;
-  position: relative;
-  overflow: hidden;
-  color: rgba(255, 255, 255, 0.92);
-  background: #07070a;
-}
-
 /* Center content */
 .centerArea {
   position: relative;
