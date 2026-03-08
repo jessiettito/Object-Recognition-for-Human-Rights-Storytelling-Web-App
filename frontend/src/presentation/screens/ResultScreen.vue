@@ -107,13 +107,10 @@ function chooseIndex(index) {
 }
 
 function goBackToCapture() {
-  retryCount.value += 1;
-  localStorage.setItem(RETRY_KEY, String(retryCount.value));
+  const nextCount = retryCount.value + 1;
 
-  if (retryCount.value >= MAX_RETRIES) {
-    router.push("/list");
-    return;
-  }
+  retryCount.value = nextCount;
+  localStorage.setItem(RETRY_KEY, String(nextCount));
 
   router.push("/capture");
 }
