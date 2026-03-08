@@ -32,19 +32,6 @@
             </button>
           </div>
 
-          <div v-if="detectionFailed" class="noResults">
-
-            <div v-if="!showListOption">
-              We couldn’t detect the object clearly. Please try again.
-            </div>
-
-            <div v-else>
-              We’re still having trouble detecting the object.
-              You can choose it manually from the list instead.
-            </div>
-
-          </div>
-
           <button class="startButton resultButton" type="button" @click="goToNextScreen">
             Continue
           </button>
@@ -73,7 +60,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watchEffect } from "vue";
+import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -99,15 +86,6 @@ const selectedIndex = ref(0);
 
 const showListOption = computed(() => retryCount.value >= MAX_RETRIES);
 
-watchEffect(() => {
-  if (detectionFailed.value) {
-    retryCount.value += 1;
-    localStorage.setItem(RETRY_KEY, retryCount.value);
-  } else {
-    localStorage.removeItem(RETRY_KEY);
-  }
-});
-
 const selected = computed(() => results.value[selectedIndex.value] || null);
 const detectedObjectLabel = computed(() => selected.value?.name || "");
 const detectedObjectScore = computed(() => selected.value?.confidence ?? null);
@@ -122,19 +100,6 @@ const confidenceText = computed(() => {
   return `Confidence: ${Math.round(detectedObjectScore.value * 100)}%`;
 });
 
-const detectionFailed = computed(() => {
-  if (!results.value.length) return true;
-
-  const top = results.value[0];
-  if (!top?.name) return true;
-
-  if (top.name === "unknown") return true;
-
-  if (top.confidence < 0.4) return true;
-
-  return false;
-});
-
 function chooseIndex(index) {
   if (index >= 0 && index < results.value.length) {
     selectedIndex.value = index;
@@ -142,15 +107,25 @@ function chooseIndex(index) {
 }
 
 function goBackToCapture() {
+  retryCount.value += 1;
+  localStorage.setItem(RETRY_KEY, String(retryCount.value));
+
   if (retryCount.value >= MAX_RETRIES) {
     router.push("/list");
-  } else {
-    router.push("/capture");
+    return;
   }
+
+  router.push("/capture");
+}
+
+function resetRetryCount() {
+  retryCount.value = 0;
+  localStorage.removeItem(RETRY_KEY);
 }
 
 function goToNextScreen() {
   // As of now moving to the list screen **** we will adding the theme screen here. *** for myself reminder...
+  resetRetryCount(); 
   router.push("/list");
 }
 </script>
