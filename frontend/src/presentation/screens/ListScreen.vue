@@ -47,10 +47,13 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import {objects as objectsData} from '../../data/Objects.js'
+import {themes as themesData} from '../../data/Themes.js'
 
 const props = defineProps({
   language: { type: String, default: "en" }
 })
+
 const router = useRouter();
 
 const textByLanguage = {
@@ -74,53 +77,15 @@ const screenText = computed(() =>
   props.language === "fr" ? textByLanguage.fr : textByLanguage.en
 )
 
-
-const DATA = {
-  objects: [
-    { id: "passport_id", en: "Passport / ID card", fr: "Passeport / Carte d’identité" },
-    { id: "suitcase", en: "Suitcase", fr: "Valise" },
-    { id: "letter", en: "Letter", fr: "Lettre" },
-    { id: "photograph", en: "Photograph", fr: "Photographie" },
-    { id: "newspaper", en: "Newspaper", fr: "Journal" },
-    { id: "poster", en: "Protest poster", fr: "Affiche de protestation" },
-    { id: "radio", en: "Radio", fr: "Radio" },
-    { id: "book", en: "Book", fr: "Livre" },
-    { id: "badge", en: "Badge / armband", fr: "Insigne / brassard" },
-    { id: "shoe", en: "Shoe", fr: "Chaussure" },
-    { id: "blanket", en: "Blanket", fr: "Couverture" },
-    { id: "phone", en: "Phone", fr: "Téléphone" },
-  ],
-  topics: [
-    { id: "culture_identity", en: "Culture/Identity", fr: "Culture/Identité" },
-    { id: "deportation", en: "Deportation", fr: "Déportation" },
-    { id: "discrimination", en: "Discrimination", fr: "Discrimination" },
-    { id: "disability", en: "Disability", fr: "Personnes handicapées" },
-    { id: "indigenous", en: "Indigenous", fr: "Autochtones" },
-    { id: "children", en: "Children", fr: "Enfants" },
-    { id: "labour", en: "Labour", fr: "Travail" },
-    { id: "political", en: "Political", fr: "Politique" },
-    { id: "refugee", en: "Refugee", fr: "Personnes réfugiées" },
-    { id: "women", en: "Women", fr: "Femmes" },
-    { id: "sexual_orientation", en: "Sexual Orientation", fr: "Orientation sexuelle" },
-    { id: "gender_identity", en: "Gender Identity", fr: "Identité sexuelle" },
-    { id: "religion", en: "Religion", fr: "Religion" },
-    { id: "education", en: "Education", fr: "Éducation" },
-    { id: "migrant", en: "Migrant", fr: "Travailleurs migrants" },
-    { id: "health", en: "Health", fr: "Santé" },
-    { id: "shelter", en: "Shelter", fr: "Logement" },
-    { id: "standard_of_living", en: "Standard of Living", fr: "Niveau de vie" },
-  ],
-};
-
 const objects = computed(() =>
-  DATA.objects.map((o) => ({
+  objectsData.map((o) => ({
     id: o.id,
     name: props.language === "fr" ? o.fr : o.en,
   }))
 );
 
 const topics = computed(() =>
-  DATA.topics.map((t) => ({
+  themesData.map((t) => ({
     id: t.id,
     name: props.language === "fr" ? t.fr : t.en,
   }))
