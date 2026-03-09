@@ -11,19 +11,21 @@
           playsinline
           class="cameraVideo">
         </video>
+
         <div v-if="!cameraStarted" class="cameraHint">
           {{ screenText.previewHint }}
+        </div>
+
       </div>
-    </div>
 
     <!-- Screen buttons -->
       <div class="bottomControls" aria-label="Camera controls">
         <button
           class="mainButton captureButton"
           type="button"
-          :disabled="showPermissionModal || !cameraStarted"
+          :disabled="isRunningDetection"
           @click="capturePhoto">
-          {{ screenText.captureButton }}
+          {{ isRunningDetection ? "Processing..." : screenText.captureButton }}
         </button>
 
         <button class="mainButton secondaryButton" type="button" @click="goToList">
@@ -53,34 +55,6 @@
         </div>
       </div>
 
-      <!-- Permission modal -->
-      <div
-        v-if="showPermissionModal"
-        class="modalOverlay"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Camera permission prompt"
-      >
-        <div class="modalCard">
-          <h1 class="modalTitle">{{ screenText.permissionTitle }}</h1>
-          <p class="modalBody">{{ screenText.permissionBody }}</p>
-
-          <div class="modalButtons">
-            <button class="mainButton startButton" type="button" @click="startCamera">
-              {{ screenText.allowCamera }}
-            </button>
-            
-            <button class="mainButton secondaryButton" type="button" @click="goToList">
-              {{ screenText.chooseObject }}
-            </button>
-
-            <button class="mainButton pillButton" type="button" @click="goHome">
-              {{ screenText.home }}
-            </button>
-          </div>
-        </div>
-      </div>
-
       <canvas ref="canvas" style="display:none"></canvas>
 
     </section>
@@ -88,10 +62,10 @@
 </template>
 
 <script setup>
-import { computed, ref, onUnmounted } from "vue";
+import { computed, ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 
-import { detectMainObject } from "../../logic/ObjectDetection.js";
+import { detectTopObjects } from "../../logic/ObjectDetection.js";
 
 const props = defineProps({
   appTitle: { type: String, default: "Human Rights Object Stories" },
@@ -99,9 +73,6 @@ const props = defineProps({
 });
 
 const router = useRouter();
-
-//Show permission modal 
-const showPermissionModal = ref(true); 
 
 const video = ref(null); 
 const canvas = ref(null);
@@ -114,6 +85,9 @@ const hiddenImageForDetection = ref(null);
 const isRunningDetection = ref(false);
 const detectionErrorMessage = ref("");
 
+const CAMERA_REQUESTED_KEY = "cameraPermissionRequested";
+const CAMERA_GRANTED_KEY = "cameraPermissionGranted";
+
 /* Camera */
 async function startCamera() {
 
@@ -122,21 +96,74 @@ async function startCamera() {
       video: true
 
     })
+    
+    if(video.value) {
+      video.value.srcObject = stream
+    }
 
-    video.value.srcObject = stream
     cameraStarted.value = true
-    showPermissionModal.value = false
+
+    localStorage.setItem(CAMERA_REQUESTED_KEY, "true");
+    localStorage.setItem(CAMERA_GRANTED_KEY, "true");
+
+    return true;
 
   } catch (err) {
     alert("Camera access failed. Please allow camera permission.")
     console.error(err)
+
+    localStorage.setItem(CAMERA_REQUESTED_KEY, "true");
+    localStorage.setItem(CAMERA_GRANTED_KEY, "false");
+
+    cameraStarted.value = false;
+    return false;
   }
 }
 
+function stopCamera() {
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+    stream = null;
+  }
+
+  if (video.value) {
+    video.value.srcObject = null;
+  }
+
+  cameraStarted.value = false;
+}
+
+onMounted(async () => {
+  const hasAskedBefore = localStorage.getItem(CAMERA_REQUESTED_KEY) === "true";
+  const cameraGrantedBefore = localStorage.getItem(CAMERA_GRANTED_KEY) === "true";
+
+  if (!hasAskedBefore) {
+    await startCamera();
+    return;
+  }
+
+  if (cameraGrantedBefore) {
+    await startCamera();
+  }
+});
+
 /* Capture snapshot */
 async function capturePhoto() {
-  if (!video.value || !canvas.value) return
   detectionErrorMessage.value = ""; 
+
+  if(!cameraStarted.value) {
+    const started = await startCamera();
+
+    if (!started) {
+      detectionErrorMessage.value = "Camera access is required to capture a photo. Please allow camera permission and try again.";
+      return;
+    }
+  }
+
+  if (!video.value || !canvas.value) {
+    detectionErrorMessage.value = "Camera is not ready. Please try again.";
+    return;
+  }
 
   try { 
     isRunningDetection.value = true;
@@ -203,9 +230,7 @@ function goToList() {
 
 /* Cleanup */
 onUnmounted(() => {
-  if (stream) {
-    stream.getTracks().forEach(track => track.stop())
-  }
+  stopCamera();
 })
 
 // this is to remind myself...
@@ -242,14 +267,15 @@ async function runDetectionFromDataUrl(imageDataUrl) {
 
   await waitForImageToLoad(imageElement, imageDataUrl);
 
-  const detected = await detectMainObject(imageElement);
-  const detectedName = detected?.name ?? "unknown";
-  const detectedConfidence = detected?.confidence ?? 0;
+  const topResults = await detectTopObjects(imageElement, { topK: 5, ignorePerson: true });
+  const detectedName = topResults[0]?.name ?? "unknown";
+  const detectedConfidence = topResults[0]?.confidence ?? 0;
 
   router.push({
     path: "/result",
     state: {
       imageDataUrl,
+      results: topResults,
       label: detectedName,
       score: detectedConfidence,
     },
@@ -278,18 +304,12 @@ async function onImageUpload(event) {
 /* Computed properties for text and styles */
 const textByLanguage = {
   en: {
-    permissionTitle: "Use camera? ",
-    permissionBody: "We only use it to scan your object.",
-    allowCamera: "Allow camera",
     chooseObject: "Choose from list",
     previewHint: "Camera preview will appear here",
     captureButton: "Capture",
     home: "Home",
   },
   fr: {
-    permissionTitle: "Utiliser la caméra?",
-    permissionBody: "Nous l’utilisons seulement pour scanner votre objet.",
-    allowCamera: "Autoriser la caméra",
     chooseObject: "Choisir un objet",
     previewHint: "Aperçu de la caméra ici",
     captureButton: "Capturer",
