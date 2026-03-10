@@ -108,4 +108,11 @@ function goToList() {
 .selection {
   margin-top: 14px;
 }
+
+.contentArea {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
 </style>
