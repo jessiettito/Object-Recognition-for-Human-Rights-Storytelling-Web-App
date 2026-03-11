@@ -10,7 +10,7 @@ export const objects = [
   { id: "badge", en: "Badge / armband", fr: "Insigne / brassard" },
   { id: "shoe", en: "Shoe", fr: "Chaussure" },
   { id: "blanket", en: "Blanket", fr: "Couverture" },
-  { id: "phone", en: "Phone", fr: "Téléphone" },
+  { id: "cell phone", en: "Cell phone", fr: "Téléphone portable" },
   { id: "cup", en: "Cup / Mug", fr: "Tasse / Mug" },
   { id: "water_bottle", en: "Water bottle", fr: "Bouteille d’eau" },
   { id: "backpack", en: "Backpack", fr: "Sac à dos" },

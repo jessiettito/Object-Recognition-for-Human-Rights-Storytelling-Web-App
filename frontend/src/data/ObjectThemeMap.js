@@ -10,7 +10,7 @@ export const objectThemeMap = {
   badge: ["political", "discrimination", "labour"],
   shoe: ["migrant", "refugee", "standard_of_living"],
   blanket: ["shelter", "health", "refugee"],
-  phone: ["migrant", "political", "culture_identity"],
+  "cell phone": ["migrant", "political", "culture_identity"],
   cup: ["standard_of_living", "culture_identity", "health"],
   water_bottle: ["health", "standard_of_living", "indigenous"],
   backpack: ["education", "children", "migrant"],
