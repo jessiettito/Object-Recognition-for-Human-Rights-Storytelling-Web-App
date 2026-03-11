@@ -74,7 +74,8 @@ import { computed, ref, onMounted, watchEffect } from "vue";
 import { useRouter } from "vue-router";
 import { themes } from "../../data/Themes.js";
 import { objects } from "../../data/Objects.js";
-import { objectThemeMap } from "../../data/objectThemeMap.js";
+import { objectThemeMap } from "../../data/ObjectThemeMap.js";
+import { promptsByThemes } from "../../data/PromptsByThemes.js";
 
 const props = defineProps({
   language: { type: String, default: "en" },
@@ -148,8 +149,9 @@ const textByLanguage = {
     tryAgain: "Try again",
     list: "Choose from list",
     popupTitle: "{object} is connected to several themes",
-    popupSubtitle: "Which one would you like to explore?"
-    
+    popupSubtitle: "Which one would you like to explore?",
+    reflectivePrompt: "Reflective Prompt",
+    title: "Themes"    
   },
   fr: {
     noThemeSelected: "Aucun thème sélectionné.",
@@ -157,7 +159,9 @@ const textByLanguage = {
     tryAgain: "Réessayer",
     list: "Choisir dans la liste",
     popupTitle: "{object} est lié à plusieurs thèmes",
-    popupSubtitle: "Lequel voulez-vous explorer ?"
+    popupSubtitle: "Lequel voulez-vous explorer ?",
+     reflectivePrompt: "Question de réflexion",
+    title: "Thèmes"
   }
 };
 
@@ -169,25 +173,25 @@ function getThemeDisplay(theme) {
 }
 
 
-// THIS NEEDS TO BE CHANGED. MOCK DATA
 function getReflectivePrompt(themeId) {
-  const prompts = {
-    en: {
-      culture_identity: "How does this object reflect your cultural identity? What memories or feelings does it evoke about your heritage?",
-      migrant: "What role has this object played in your journey? How does it connect you to your past or future?",
-      refugee: "What does this object represent about resilience and hope? How has it helped you maintain your identity?"
-    },
-    fr: {
-      culture_identity: "Comment cet objet reflète-t-il votre identité culturelle ? Quels souvenirs ou sentiments évoque-t-il concernant votre héritage ?",
-      migrant: "Quel rôle cet objet a-t-il joué dans votre parcours ? Comment vous relie-t-il à votre passé ou à votre avenir ?",
-      refugee: "Que représente cet objet en termes de résilience et d'espoir ? Comment vous a-t-il aidé à maintenir votre identité ?"
-    }
-  };
-  
-  const languagePrompts = prompts[props.language] || prompts.en;
-  return languagePrompts[themeId] || "Tell us about your connection to this theme.";
-}
+  const promptsForTheme = promptsByThemes[themeId];
+  if (!promptsForTheme) {
+    return props.language === "fr"
+      ? "Parlez-nous de votre lien avec ce thème."
+      : "Tell us about your connection to this theme.";
+  }
 
+  const languagePrompts = promptsForTheme[props.language] || promptsForTheme.en || [];
+
+  if (!languagePrompts.length) {
+    return props.language === "fr"
+      ? "Parlez-nous de votre lien avec ce thème."
+      : "Tell us about your connection to this theme.";
+  }
+
+  const randomIndex = Math.floor(Math.random() * languagePrompts.length);
+  return languagePrompts[randomIndex];
+}
 
 function goBack() {
   router.back();
