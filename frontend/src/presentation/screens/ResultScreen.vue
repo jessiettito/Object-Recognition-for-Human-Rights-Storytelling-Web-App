@@ -129,39 +129,14 @@ function goToNextScreen() {
     state: {
       source: "result",
       type: "object",
-      id: selectedObjectId.value,
+      objectId: selectedObjectId.value,
       name: objectNameText.value,
     },
   });
 }
 
-const detectionToObjectIdMap = {
-  passport: "passport_id",
-  "id card": "passport_id",
-  suitcase: "suitcase",
-  letter: "letter",
-  photograph: "photograph",
-  photo: "photograph",
-  newspaper: "newspaper",
-  poster: "poster",
-  "protest poster": "poster",
-  radio: "radio",
-  book: "book",
-  badge: "badge",
-  armband: "badge",
-  shoe: "shoe",
-  blanket: "blanket",
-  phone: "phone",
-  "cell phone": "phone",
-  "mobile phone": "phone",
-};
-
 const selectedObjectId = computed(() => {
   const label = (detectedObjectLabel.value || "").toLowerCase().trim();
-
-  if (detectionToObjectIdMap[label]) {
-    return detectionToObjectIdMap[label];
-  }
 
   const matchedObject = objectData.find(
     (item) =>
