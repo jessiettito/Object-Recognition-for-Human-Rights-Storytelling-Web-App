@@ -102,14 +102,14 @@ function goToCapture() {
 function selectObject(item) {
   router.push({
     path: "/themes",
-    state: { source: "list", type: "object", id: item.id, name: item.name },
+    state: { source: "list", type: "object", objectId: item.id, name: item.name },
   });
 }
 
 function selectTopic(item) {
   router.push({
     path: "/themes",
-    state: { source: "list", type: "topic", id: item.id, name: item.name },
+    state: { source: "list", type: "theme", themeId: item.id, name: item.name },
   });
 }
 

@@ -6,14 +6,25 @@
       <div class="modalCard">
         <h1 id="title" class="title">{{ screenText.title }}</h1>
 
-        <p class="body">
-          {{ screenText.body }}
-        </p>
-
+        <!-- Show selected object/theme information -->
         <div v-if="selectionText" class="selection">
           <span class="pill">{{ selectionText }}</span>
         </div>
+ 
+        <!-- Display theme and reflective prompt -->
+        <div v-if="currentTheme" class="themeContent">
+          <div class="promptSection">
+            <h3 class="promptLabel">{{ screenText.reflectivePrompt }}</h3>
+            <p class="prompt">{{ getReflectivePrompt(currentTheme.id) }}</p>
+          </div>
+        </div>
 
+        <!-- Fallback when no theme is selected -->
+        <p v-else class="body">
+          {{ screenText.noThemeSelected }}
+        </p>
+
+        <!-- Buttons -->
         <div class="modalButtons">
           <button class="mainButton startButton" type="button" @click="goBack">
             {{ screenText.back }}
@@ -29,12 +40,41 @@
         </div>
       </div>
     </section>
+
+      <!-- Pop up screen -->
+    <div v-if="showPopup" class="popupOverlay">
+      <div class="modalCard popupCard">
+        <h2 class="popupTitle">
+          {{ screenText.popupTitle.replace("{object}", selectedName) }}
+        </h2>
+        <p class="popupSubtitle">
+          {{ screenText.popupSubtitle }}
+        </p>
+
+        <div class="popupOptions">
+          <button
+            v-for="theme in availableThemes"
+            :key="theme.id"
+            class="popupButton"
+            @click="selectThemeFromPopup(theme.id)"
+          >
+            {{ getThemeDisplay(theme) }}
+          </button>
+        </div>
+        <button class="popupCancel" @click="goBack">
+          Go back
+        </button>
+      </div>
+    </div>
   </main>
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref, onMounted, watchEffect } from "vue";
 import { useRouter } from "vue-router";
+import { themes } from "../../data/Themes.js";
+import { objects } from "../../data/Objects.js";
+import { objectThemeMap } from "../../data/objectThemeMap.js";
 
 const props = defineProps({
   language: { type: String, default: "en" },
@@ -42,40 +82,112 @@ const props = defineProps({
 
 const router = useRouter();
 
-const navigationState = computed(() => window.history.state || {});
+const showPopup = ref(false)
+const activeThemeId = ref("")
 
-// coming from ListScreen click handlers (optional)
+// Navigation state values
+const navigationState = computed(() => window.history.state || {});
 const selectedType = computed(() => navigationState.value.type || "");
 const selectedName = computed(() => navigationState.value.name || "");
+const selectedThemeId = computed(() => navigationState.value.themeId || "");
+const selectedObjectId = computed(() => navigationState.value.objectId || "");
 
+// Find the current theme to display
+// if theme option was selected
+const currentTheme = computed(() => {
+  const id = activeThemeId.value || selectedThemeId.value
+  return themes.find(t => t.id === id)
+})
+
+
+// if object was selected, show themes
+const availableThemes = computed(() => {
+  if (!selectedObjectId.value) return []
+  const themeIds = objectThemeMap[selectedObjectId.value] || []
+  return themes.filter(theme => themeIds.includes(theme.id))
+})
+
+onMounted(() => {
+  console.log("Navigation state:", navigationState.value);
+  console.log("selectedType:", selectedType.value);
+  console.log("selectedObjectId:", selectedObjectId.value);
+  console.log("availableThemes:", availableThemes.value);
+
+  if (selectedType.value === "object" && availableThemes.value.length > 0) {
+    showPopup.value = true;
+    console.log("Popup shown!");
+  }
+});
+
+// Select theme from object
+function selectThemeFromPopup(themeId) {
+  activeThemeId.value = themeId
+  showPopup.value = false
+}
+
+
+// Display text for the selected item
 const selectionText = computed(() => {
-  if (!selectedName.value) return "";
-  const prefix = selectedType.value === "topic"
-    ? (props.language === "fr" ? "Sujet" : "Topic")
-    : (props.language === "fr" ? "Objet" : "Object");
-  return `${prefix}: ${selectedName.value}`;
+  if (selectedType.value === "theme" && selectedName.value) {
+    const prefix = props.language === "fr" ? "Thème" : "Theme";
+    return `${prefix}: ${selectedName.value}`;
+  }
+  
+  if (selectedType.value === "object" && selectedName.value) {
+    const prefix = props.language === "fr" ? "Objet" : "Object";
+    const themeName = currentTheme.value ? getThemeDisplay(currentTheme.value) : "";
+    return `${selectedName.value} → ${themeName}`;
+  }
+  return "";
 });
 
 const textByLanguage = {
   en: {
-    title: "Themes & Prompts",
-    body:
-      "This screen is under construction",
+    noThemeSelected: "No theme selected. Please choose a theme.",
     back: "Back",
     tryAgain: "Try again",
-    list: "Choose from list"
+    list: "Choose from list",
+    popupTitle: "{object} is connected to several themes",
+    popupSubtitle: "Which one would you like to explore?"
+    
   },
   fr: {
-    title: "Thèmes et questions",
-    body:
-      "Cette page est en cours de construction.",
+    noThemeSelected: "Aucun thème sélectionné.",
     back: "Retour",
     tryAgain: "Réessayer",
-    list: "Choisir dans la liste"
-  },
+    list: "Choisir dans la liste",
+    popupTitle: "{object} est lié à plusieurs thèmes",
+    popupSubtitle: "Lequel voulez-vous explorer ?"
+  }
 };
 
 const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr : textByLanguage.en));
+
+// Helper functions
+function getThemeDisplay(theme) {
+  return props.language === "fr" ? theme.fr : theme.en;
+}
+
+
+// THIS NEEDS TO BE CHANGED. MOCK DATA
+function getReflectivePrompt(themeId) {
+  const prompts = {
+    en: {
+      culture_identity: "How does this object reflect your cultural identity? What memories or feelings does it evoke about your heritage?",
+      migrant: "What role has this object played in your journey? How does it connect you to your past or future?",
+      refugee: "What does this object represent about resilience and hope? How has it helped you maintain your identity?"
+    },
+    fr: {
+      culture_identity: "Comment cet objet reflète-t-il votre identité culturelle ? Quels souvenirs ou sentiments évoque-t-il concernant votre héritage ?",
+      migrant: "Quel rôle cet objet a-t-il joué dans votre parcours ? Comment vous relie-t-il à votre passé ou à votre avenir ?",
+      refugee: "Que représente cet objet en termes de résilience et d'espoir ? Comment vous a-t-il aidé à maintenir votre identité ?"
+    }
+  };
+  
+  const languagePrompts = prompts[props.language] || prompts.en;
+  return languagePrompts[themeId] || "Tell us about your connection to this theme.";
+}
+
 
 function goBack() {
   router.back();
@@ -105,8 +217,22 @@ function goToList() {
   opacity: 0.92;
 }
 
-.selection {
-  margin-top: 14px;
+.selection .pill {
+  font-family: "Inter", sans-serif;
+  font-size: 20px;          /* bigger than before */
+  font-weight: 700;          /* bolder */
+  padding: 12px 22px;
+  border-radius: 22px;
+  background: rgba(147, 197, 253, 0.25); /* bluish highlight */
+  color: #fdf6f0;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+  text-transform: capitalize;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.selection .pill:hover {
+  transform: translateY(-2px);
+  background: rgba(147, 197, 253, 0.4);
 }
 
 .contentArea {
@@ -115,4 +241,93 @@ function goToList() {
   align-items: center;
   min-height: 100vh;
 }
+
+.promptSection {
+  font-family: "Inter", "Roboto", sans-serif;
+  font-size: 18px;         /* slightly bigger for readability */
+  line-height: 1.6;        /* more spacing between lines */
+  font-weight: 500;
+  color: #fdf6f0;          /* light text for contrast */
+  background: rgba(23, 33, 61, 0.35); /* subtle dark-blueish bubble */
+  padding: 16px 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3); /* subtle depth */
+  margin-top: 16px;
+  text-align: left;
+}
+
+.objectName {
+  font-style: italic;
+}
+
+.popupOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popupCard {
+  background: #0f172a; /* solid dark blueish background */
+  color: #ffffff;       /* make text readable */
+  border-radius: 20px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* subtle shadow */
+}
+
+.popupTitle {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.popupSubtitle {
+  margin-top: 6px;
+  font-size: 18px;
+  opacity: 0.85;
+}
+
+.popupOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.popupButton {
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 16px;          /* slightly larger font */
+  cursor: pointer;
+  background: #1e293b;       /* slightly lighter than popup background */
+  color: #ffffff;
+  transition: all 0.15s ease;
+}
+
+.popupButton:hover {
+  background: #334155;       /* subtle hover effect */
+  transform: translateY(-1px);
+}
+
+.popupCancel {
+  margin-top: 6px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: #94a3b8;           /* soft gray for cancel */
+  cursor: pointer;
+}
+
+.popupCancel:hover {
+  opacity: 0.7;
+}
+
 </style>
