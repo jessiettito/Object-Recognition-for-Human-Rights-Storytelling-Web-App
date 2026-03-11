@@ -11,4 +11,18 @@ export const objects = [
   { id: "shoe", en: "Shoe", fr: "Chaussure" },
   { id: "blanket", en: "Blanket", fr: "Couverture" },
   { id: "phone", en: "Phone", fr: "Téléphone" },
+  { id: "cup", en: "Cup / Mug", fr: "Tasse / Mug" },
+  { id: "water_bottle", en: "Water bottle", fr: "Bouteille d’eau" },
+  { id: "backpack", en: "Backpack", fr: "Sac à dos" },
+  { id: "laptop", en: "Laptop", fr: "Ordinateur portable" },
+  { id: "remote", en: "Remote control", fr: "Télécommande" },
+  { id: "tv", en: "Television", fr: "Télévision" },
+  { id: "glasses", en: "Glasses", fr: "Lunettes" },
+  { id: "medicine", en: "Medicine bottle", fr: "Flacon de médicament" },
+  { id: "wallet", en: "Wallet", fr: "Portefeuille" },
+  { id: "watch", en: "Watch", fr: "Montre" },
+  { id: "bicycle", en: "Bicycle", fr: "Vélo" },
+  { id: "food_plate", en: "Plate of food", fr: "Assiette de nourriture" },
+  { id: "school_bag", en: "School bag", fr: "Sac d’école" },
+  { id: "headphones", en: "Headphones", fr: "Casque audio" }
 ];
