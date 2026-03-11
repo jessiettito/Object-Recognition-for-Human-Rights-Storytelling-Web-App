@@ -62,6 +62,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
+import { objects as objectData } from "../../data/Objects.js";
 
 const router = useRouter();
 
@@ -121,10 +122,56 @@ function resetRetryCount() {
 }
 
 function goToNextScreen() {
-  // As of now moving to the list screen **** we will adding the theme screen here. *** for myself reminder...
-  resetRetryCount(); 
-  router.push("/list");
+  resetRetryCount();
+
+  router.push({
+    path: "/themes",
+    state: {
+      source: "result",
+      type: "object",
+      id: selectedObjectId.value,
+      name: objectNameText.value,
+    },
+  });
 }
+
+const detectionToObjectIdMap = {
+  passport: "passport_id",
+  "id card": "passport_id",
+  suitcase: "suitcase",
+  letter: "letter",
+  photograph: "photograph",
+  photo: "photograph",
+  newspaper: "newspaper",
+  poster: "poster",
+  "protest poster": "poster",
+  radio: "radio",
+  book: "book",
+  badge: "badge",
+  armband: "badge",
+  shoe: "shoe",
+  blanket: "blanket",
+  phone: "phone",
+  "cell phone": "phone",
+  "mobile phone": "phone",
+};
+
+const selectedObjectId = computed(() => {
+  const label = (detectedObjectLabel.value || "").toLowerCase().trim();
+
+  if (detectionToObjectIdMap[label]) {
+    return detectionToObjectIdMap[label];
+  }
+
+  const matchedObject = objectData.find(
+    (item) =>
+      item.id.toLowerCase() === label ||
+      item.en.toLowerCase() === label
+  );
+
+  return matchedObject?.id || "";
+});
+
 </script>
 
 <style scoped>
