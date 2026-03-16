@@ -23,8 +23,13 @@
         <h2 class="list-title">{{ screenText.objects }}</h2>
         <div class="scroll-list" role = "list">
           <button v-for="item in objects" :key="item.id" class="item" type="button" @click="selectObject(item)">
+            <img class="item-icon"
+              :src="`/icons/${item.icon}`"
+              :alt="item.en"
+              loading="lazy"
+            />
             <span class = "listItemText">{{ item.name }}</span>
-            <span class="chev" aria-hidden="true">›</span>
+            <span class="chev" aria-hidden="true"></span>
           </button>
         </div>
       </section>
@@ -34,12 +39,16 @@
         <h2 class="list-title">{{ screenText.topics }}</h2>
         <div class="scroll-list" role = "list"> 
           <button v-for="item in topics" :key="item.id" class="item" type ="button" @click = "selectTopic(item)">
+            <img class="item-icon"
+            :src="`/icons/${item.icon}`"
+            :alt="item.en"
+            loading="lazy"
+          />
             <span class = "listItemText">{{ item.name }}</span>
-            <span class="chev" aria-hidden="true">›</span>
+            <span class="chev" aria-hidden="true"></span>
           </button>
         </div>
       </section>
-
     </div>
   </main>
 </template>
@@ -81,6 +90,7 @@ const objects = computed(() =>
   objectsData.map((o) => ({
     id: o.id,
     name: props.language === "fr" ? o.fr : o.en,
+    icon: o.icon, 
   }))
 );
 
@@ -88,6 +98,7 @@ const topics = computed(() =>
   themesData.map((t) => ({
     id: t.id,
     name: props.language === "fr" ? t.fr : t.en,
+    icon: t.icon, 
   }))
 );
 
@@ -210,8 +221,12 @@ function selectTopic(item) {
 .item {
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
   padding: 14px 16px;
   border-radius: 12px;
 
@@ -221,6 +236,12 @@ function selectTopic(item) {
 
   cursor: pointer;
   transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.item-icon {
+  width: 60px;      
+  height: 60px;     
+  object-fit: contain; 
 }
 
 .chev {
