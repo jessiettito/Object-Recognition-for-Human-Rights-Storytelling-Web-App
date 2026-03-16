@@ -244,6 +244,11 @@ function selectTopic(item) {
   object-fit: contain; 
 }
 
+.item-icon:hover{
+  transform: scale(1.1);            
+  filter: brightness(1.2);      
+}
+
 .chev {
   opacity: 0.75;
   font-size: 22px;
