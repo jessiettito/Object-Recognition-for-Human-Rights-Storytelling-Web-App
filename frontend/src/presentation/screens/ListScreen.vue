@@ -244,8 +244,8 @@ function selectTopic(item) {
   object-fit: contain; 
 }
 
-.item-icon:hover{
-  transform: scale(1.1);            
+.item:hover{
+  transform: scale(1.5);            
   filter: brightness(1.2);      
 }
 
@@ -257,5 +257,6 @@ function selectTopic(item) {
 .item:hover {
   transform: translateY(-2px);
   background: rgba(255, 255, 255, 0.12);
+  filter: brightness(1.2);      
 }
 </style>
