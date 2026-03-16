@@ -239,8 +239,8 @@ function selectTopic(item) {
 }
 
 .item-icon {
-  width: 60px;      
-  height: 60px;     
+  width: 100px;      
+  height: 100px;     
   object-fit: contain; 
 }
 
