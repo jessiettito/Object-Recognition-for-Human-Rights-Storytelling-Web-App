@@ -26,8 +26,8 @@
 
         <!-- Buttons -->
         <div class="modalButtons">
-          <button class="mainButton startButton" type="button" @click="goBack">
-            {{ screenText.back }}
+          <button class="mainButton startButton" type="button" @click="goToStory">
+            {{ screenText.continue }}
           </button>
 
           <button class="mainButton secondaryButton" type="button" @click="goToCapture">
@@ -61,8 +61,8 @@
             {{ getThemeDisplay(theme) }}
           </button>
         </div>
-        <button class="popupCancel" @click="goBack">
-          Go back
+        <button class="popupCancel" @click="goToStory">
+          Continue without selecting
         </button>
       </div>
     </div>
@@ -145,7 +145,7 @@ const selectionText = computed(() => {
 const textByLanguage = {
   en: {
     noThemeSelected: "No theme selected. Please choose a theme.",
-    back: "Back",
+    continue: "Continue",
     tryAgain: "Try again",
     list: "Choose from list",
     popupTitle: "{object} is connected to several themes",
@@ -155,7 +155,7 @@ const textByLanguage = {
   },
   fr: {
     noThemeSelected: "Aucun thème sélectionné.",
-    back: "Retour",
+    continue: "Continuer",
     tryAgain: "Réessayer",
     list: "Choisir dans la liste",
     popupTitle: "{object} est lié à plusieurs thèmes",
@@ -193,8 +193,8 @@ function getReflectivePrompt(themeId) {
   return languagePrompts[randomIndex];
 }
 
-function goBack() {
-  router.back();
+function goToStory() {
+  router.push("/story");
 }
 
 function goToCapture() {
