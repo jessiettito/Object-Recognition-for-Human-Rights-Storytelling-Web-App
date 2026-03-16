@@ -8,7 +8,23 @@
 
         <!-- Show selected object/theme information -->
         <div v-if="selectionText" class="selection">
+          <!-- Left: Object Icon -->
+          <img
+            v-if="selectedObjectId"
+            :src="`/icons/${getObjectIcon(selectedObjectId)}`"
+            :alt="selectedName"
+            class="objectIcon"
+          />
+
           <span class="pill">{{ selectionText }}</span>
+
+          <!-- Right: Theme Icon -->
+          <img
+            v-if="currentTheme"
+            :src="`/icons/${currentTheme.icon}`"
+            :alt="currentTheme.name"
+            class="themeIcon"
+          />
         </div>
  
         <!-- Display theme and reflective prompt -->
@@ -193,6 +209,27 @@ function getReflectivePrompt(themeId) {
   return languagePrompts[randomIndex];
 }
 
+const objectsList = computed(() =>
+  objects.map(o => ({
+    id: o.id,
+    name: props.language === "fr" ? o.fr : o.en,
+    icon: o.icon,
+  }))
+);
+
+const themesList = computed(() =>
+  themes.map(t => ({
+    id: t.id,
+    name: props.language === "fr" ? t.fr : t.en,
+    icon: t.icon,
+  }))
+);
+
+function getObjectIcon(objectId) {
+  const obj = objectsList.value.find(o => o.id === objectId);
+  return obj?.icon || "";
+}
+
 function goToStory() {
   router.push("/story");
 }
@@ -333,5 +370,29 @@ function goToList() {
 .popupCancel:hover {
   opacity: 0.7;
 }
+
+.selection {
+  display: flex;
+  align-items: center;       /* vertically center the icons and bubble */
+  justify-content: center;   /* center horizontally in the card */
+  gap: 24px;                 /* more space between object icon, bubble, theme icon */
+  margin: 16px 0;
+}
+
+.selection .objectIcon,
+.selection .themeIcon {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  transition: transform 0.2s ease, filter 0.2s ease;
+
+}
+
+.selection .objectIcon:hover,
+.selection .themeIcon:hover {
+  transform: scale(1.1);            
+  filter: brightness(1.2);      
+}
+
 
 </style>
