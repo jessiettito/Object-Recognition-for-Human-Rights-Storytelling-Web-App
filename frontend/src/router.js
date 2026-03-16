@@ -4,13 +4,15 @@ import CaptureScreen from "./presentation/screens/CaptureScreen.vue";
 import ResultScreen from "./presentation/screens/ResultScreen.vue";
 import ListScreen from './presentation/screens/ListScreen.vue';
 import ThemesScreen from './presentation/screens/ThemesScreen.vue';
+import StoryScreen from './presentation/screens/StoryScreen.vue';
 
 const routes = [
   { path: '/', component: WelcomeScreen },
   { path: "/capture", component: CaptureScreen },
   { path: '/list', component: ListScreen },
+  { path: '/story', component: StoryScreen },
   { path: '/result', component: ResultScreen },
-  { path: '/themes', component: ThemesScreen }
+  { path: '/themes', component: ThemesScreen },
 ]
 
 const router = createRouter({
