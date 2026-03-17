@@ -8,32 +8,32 @@
 
         <!-- Show selected object/theme information -->
         <!-- THEME ONLY -->
-<div v-if="!selectedObjectId && currentTheme" class="selection columnLayout">
-  <img
-    :src="`/icons/${currentTheme.icon}`"
-    :alt="currentTheme.name"
-    class="themeIcon"
-  />
+        <div v-if="!selectedObjectId && currentTheme" class="selection columnLayout">
+          <img
+            :src="`/icons/${currentTheme.icon}`"
+            :alt="currentTheme.name"
+            class="themeIcon"
+          />
 
-  <span class="pill">{{ selectionText }}</span>
-</div>
+          <span class="pill">{{ selectionText }}</span>
+        </div>
 
-<!-- OBJECT + THEME -->
-<div v-else-if="selectedObjectId && currentTheme" class="selection">
-  <img
-    :src="`/icons/${getObjectIcon(selectedObjectId)}`"
-    :alt="selectedName"
-    class="objectIcon"
-  />
+        <!-- OBJECT + THEME -->
+        <div v-else-if="selectedObjectId && currentTheme" class="selection">
+          <img
+            :src="`/icons/${getObjectIcon(selectedObjectId)}`"
+            :alt="selectedName"
+            class="objectIcon"
+          />
 
-  <span class="pill">{{ selectionText }}</span>
+          <span class="pill">{{ selectionText }}</span>
 
-  <img
-    :src="`/icons/${currentTheme.icon}`"
-    :alt="currentTheme.name"
-    class="themeIcon"
-  />
-</div>
+          <img
+            :src="`/icons/${currentTheme.icon}`"
+            :alt="currentTheme.name"
+            class="themeIcon"
+          />
+        </div>
  
         <!-- Display theme and reflective prompt -->
         <div v-if="currentTheme" class="themeContent">
@@ -48,18 +48,16 @@
           {{ screenText.noThemeSelected }}
         </p>
 
-        <!-- Buttons -->
+        <!-- Single timed button -->
         <div class="modalButtons">
-          <button class="mainButton startButton" type="button" @click="goToStory">
-            {{ screenText.continue }}
-          </button>
-
-          <button class="mainButton secondaryButton" type="button" @click="goToCapture">
-            {{ screenText.tryAgain }}
-          </button>
-
-          <button class="mainButton secondaryButton" type="button" @click="goToList">
-            {{ screenText.list }}
+          <button 
+            class="mainButton startButton" 
+            :class="{ 'filling': timerActive }"
+            type="button" 
+            @click="goToStory"
+          >
+            <span class="buttonText">{{ screenText.continue }}</span>
+            <span class="fillBar"></span>
           </button>
         </div>
       </div>
@@ -94,7 +92,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, watchEffect } from "vue";
+import { computed, ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { themes } from "../../data/Themes.js";
 import { objects } from "../../data/Objects.js";
@@ -106,9 +104,10 @@ const props = defineProps({
 });
 
 const router = useRouter();
-
 const showPopup = ref(false)
 const activeThemeId = ref("")
+const timerActive = ref(false);
+let autoRedirectTimer = null;
 
 // Navigation state values
 const navigationState = computed(() => window.history.state || {});
@@ -144,10 +143,12 @@ onMounted(() => {
   }
 });
 
-// Select theme from object
+// Select theme from object. 
+// Start timer after popup selection
 function selectThemeFromPopup(themeId) {
-  activeThemeId.value = themeId
-  showPopup.value = false
+  activeThemeId.value = themeId;
+  showPopup.value = false;
+  startAutoRedirect(); // Start countdown after selection
 }
 
 
@@ -238,7 +239,36 @@ function getObjectIcon(objectId) {
   return obj?.icon || "";
 }
 
+// Start timer when theme is confirmed (popup closed or direct theme selection)
+function startAutoRedirect() {
+  timerActive.value = true;
+  
+  autoRedirectTimer = setTimeout(() => {
+    goToStory();
+  }, 10000); // 10 seconds
+}
+// Clean up on unmount
+onUnmounted(() => {
+  if (autoRedirectTimer) {
+    clearTimeout(autoRedirectTimer);
+  }
+});
+onMounted(() => {
+  // If coming with a theme directly (no popup needed), start timer
+  if (selectedType.value === "theme" && selectedThemeId.value) {
+    startAutoRedirect();
+  }
+  
+  // If object selected, show popup first
+  if (selectedType.value === "object" && availableThemes.value.length > 0) {
+    showPopup.value = true;
+  }
+});
+
 function goToStory() {
+  if (autoRedirectTimer) {
+    clearTimeout(autoRedirectTimer);
+  }
   router.push("/story");
 }
 
@@ -268,11 +298,11 @@ function goToList() {
 
 .selection .pill {
   font-family: "Inter", sans-serif;
-  font-size: 20px;          /* bigger than before */
-  font-weight: 700;          /* bolder */
+  font-size: 20px;         
+  font-weight: 700;        
   padding: 12px 22px;
   border-radius: 22px;
-  background: rgba(147, 197, 253, 0.25); /* bluish highlight */
+  background: rgba(147, 197, 253, 0.25); 
   color: #fdf6f0;
   box-shadow: 0 4px 14px rgba(0,0,0,0.35);
   text-transform: capitalize;
@@ -293,14 +323,14 @@ function goToList() {
 
 .promptSection {
   font-family: "Inter", "Roboto", sans-serif;
-  font-size: 18px;         /* slightly bigger for readability */
-  line-height: 1.6;        /* more spacing between lines */
+  font-size: 18px;         
+  line-height: 1.6;        
   font-weight: 500;
-  color: #fdf6f0;          /* light text for contrast */
-  background: rgba(23, 33, 61, 0.35); /* subtle dark-blueish bubble */
+  color: #fdf6f0;         
+  background: rgba(23, 33, 61, 0.35); 
   padding: 16px 20px;
   border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3); /* subtle depth */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3); 
   margin-top: 16px;
   text-align: left;
 }
@@ -322,14 +352,14 @@ function goToList() {
 }
 
 .popupCard {
-  background: #0f172a; /* solid dark blueish background */
-  color: #ffffff;       /* make text readable */
+  background: #0f172a; 
+  color: #ffffff;      
   border-radius: 20px;
   padding: 24px;
   max-width: 400px;
   width: 90%;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* subtle shadow */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); 
 }
 
 .popupTitle {
@@ -354,15 +384,15 @@ function goToList() {
   border: none;
   border-radius: 12px;
   padding: 12px;
-  font-size: 16px;          /* slightly larger font */
+  font-size: 16px;          
   cursor: pointer;
-  background: #1e293b;       /* slightly lighter than popup background */
+  background: #1e293b;     
   color: #ffffff;
   transition: all 0.15s ease;
 }
 
 .popupButton:hover {
-  background: #334155;       /* subtle hover effect */
+  background: #334155;       
   transform: translateY(-1px);
 }
 
@@ -371,7 +401,7 @@ function goToList() {
   border: none;
   background: transparent;
   font-size: 14px;
-  color: #94a3b8;           /* soft gray for cancel */
+  color: #94a3b8;           
   cursor: pointer;
 }
 
@@ -381,9 +411,9 @@ function goToList() {
 
 .selection {
   display: flex;
-  align-items: center;       /* vertically center the icons and bubble */
-  justify-content: center;   /* center horizontally in the card */
-  gap: 24px;                 /* more space between object icon, bubble, theme icon */
+  align-items: center;      
+  justify-content: center;  
+  gap: 24px;                
   margin: 16px 0;
 }
 
@@ -406,4 +436,52 @@ function goToList() {
   flex-direction: column;
 }
 
+.startButton {
+  position: relative;
+  overflow: hidden;
+  background: rgba(59, 130, 246, 0.2); /* subtle blue base */
+  border: 2px solid rgba(59, 130, 246, 0.5);
+  z-index: 1;
+}
+
+.startButton .buttonText {
+  position: relative;
+  z-index: 2; 
+}
+
+.startButton .fillBar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: linear-gradient(90deg, #a7f3d0, #60a5fa);
+  z-index: 1;
+  transition: none;
+}
+
+.startButton.filling .fillBar {
+  animation: fillProgress 10s linear forwards;
+}
+@keyframes fillProgress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.startButton.filling {
+  animation: subtlePulse 10s ease-in-out;
+}
+
+@keyframes subtlePulse {
+  0%, 70% {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  }
+  85%, 100% {
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.5);
+  }
+}
 </style>
