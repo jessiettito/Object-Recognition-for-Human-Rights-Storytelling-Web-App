@@ -7,25 +7,33 @@
         <h1 id="title" class="title">{{ screenText.title }}</h1>
 
         <!-- Show selected object/theme information -->
-        <div v-if="selectionText" class="selection">
-          <!-- Left: Object Icon -->
-          <img
-            v-if="selectedObjectId"
-            :src="`/icons/${getObjectIcon(selectedObjectId)}`"
-            :alt="selectedName"
-            class="objectIcon"
-          />
+        <!-- THEME ONLY -->
+<div v-if="!selectedObjectId && currentTheme" class="selection columnLayout">
+  <img
+    :src="`/icons/${currentTheme.icon}`"
+    :alt="currentTheme.name"
+    class="themeIcon"
+  />
 
-          <span class="pill">{{ selectionText }}</span>
+  <span class="pill">{{ selectionText }}</span>
+</div>
 
-          <!-- Right: Theme Icon -->
-          <img
-            v-if="currentTheme"
-            :src="`/icons/${currentTheme.icon}`"
-            :alt="currentTheme.name"
-            class="themeIcon"
-          />
-        </div>
+<!-- OBJECT + THEME -->
+<div v-else-if="selectedObjectId && currentTheme" class="selection">
+  <img
+    :src="`/icons/${getObjectIcon(selectedObjectId)}`"
+    :alt="selectedName"
+    class="objectIcon"
+  />
+
+  <span class="pill">{{ selectionText }}</span>
+
+  <img
+    :src="`/icons/${currentTheme.icon}`"
+    :alt="currentTheme.name"
+    class="themeIcon"
+  />
+</div>
  
         <!-- Display theme and reflective prompt -->
         <div v-if="currentTheme" class="themeContent">
@@ -394,5 +402,8 @@ function goToList() {
   filter: brightness(1.2);      
 }
 
+.selection.columnLayout {
+  flex-direction: column;
+}
 
 </style>
