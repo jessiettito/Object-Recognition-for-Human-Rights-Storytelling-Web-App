@@ -1,61 +1,84 @@
 <template>
   <main class="page" role="main" aria-label="Explore topics screen">
 
-    <!-- Background layers -->
-    <div class="backgroundLayers" aria-hidden="true">
-      <div class="backgroundPhoto" :style="backgroundStyle"></div>
-      <div class="backgroundPhotoBlur" :style="backgroundStyle"></div>
-      <div class="backgroundDarkenOverlay"></div>
-    </div>
-
     <!-- Main title -->
     <header class="header">
-      <h1 class="title">{{ screenText.title }}</h1>
+      <div class = "headerTop">
+        <h1 class="title">{{ screenText.title }}</h1>
+        <div class="navButtons" aria-label="Navigation buttons">
+          <button class="mainButton secondaryButton" type="button" @click="goToCapture">
+            {{ screenText.capture }}
+          </button>
+          <button class="mainButton homeButton" type="button" @click="goHome">
+            {{ screenText.home }}
+          </button>
+        </div>
+      </div>
     </header>
 
     <!-- Lists -->
     <div class="lists-wrapper">
       <!-- Objects list -->
-      <div class="list-card">
+      <section class="list-card">
         <h2 class="list-title">{{ screenText.objects }}</h2>
-        <div class="scroll-list">
-          <div v-for="item in objects" :key="item" class="item">
-            {{ item.name }}
-          </div>
+        <div class="scroll-list" role = "list">
+          <button v-for="item in objects" :key="item.id" class="item" type="button" @click="selectObject(item)">
+            <img class="item-icon"
+              :src="`/icons/${item.icon}`"
+              :alt="item.en"
+              loading="lazy"
+            />
+            <span class = "listItemText">{{ item.name }}</span>
+            <span class="chev" aria-hidden="true"></span>
+          </button>
         </div>
-      </div>
+      </section>
 
       <!-- Topics list -->
-      <div class="list-card">
+      <section class="list-card">
         <h2 class="list-title">{{ screenText.topics }}</h2>
-        <div class="scroll-list"> 
-          <div v-for="item in topics" :key="item" class="item">
-            {{ item.name }}
-          </div>
+        <div class="scroll-list" role = "list"> 
+          <button v-for="item in topics" :key="item.id" class="item" type ="button" @click = "selectTopic(item)">
+            <img class="item-icon"
+            :src="`/icons/${item.icon}`"
+            :alt="item.en"
+            loading="lazy"
+          />
+            <span class = "listItemText">{{ item.name }}</span>
+            <span class="chev" aria-hidden="true"></span>
+          </button>
         </div>
-      </div>
-
+      </section>
     </div>
   </main>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import {objects as objectsData} from '../../data/Objects.js'
+import {themes as themesData} from '../../data/Themes.js'
 
 const props = defineProps({
   language: { type: String, default: "en" }
 })
 
+const router = useRouter();
+
 const textByLanguage = {
   en: {
     title: "Explore Topics",
     objects: "Objects",
-    topics: "Topics"
+    topics: "Topics",
+    home: "Home",
+    capture: "Capture",
   },
   fr: {
     title: "Explorer les sujets",
     objects: "Objets",
-    topics: "Sujets"
+    topics: "Sujets",
+    home: "Accueil",
+    capture: "Caméra",
   }
 };
 
@@ -63,33 +86,55 @@ const screenText = computed(() =>
   props.language === "fr" ? textByLanguage.fr : textByLanguage.en
 )
 
-/* Mock data */
-const objects = ref(
-  Array.from({ length: 50 }, (_, i) => ({
-    id: i,
-    name: `Object ${i + 1}`
+const objects = computed(() =>
+  objectsData.map((o) => ({
+    id: o.id,
+    name: props.language === "fr" ? o.fr : o.en,
+    icon: o.icon, 
   }))
-)
+);
 
-const topics = ref(
-  Array.from({ length: 50 }, (_, i) => ({
-    id: i,
-    name: `Topic ${i + 1}`
+const topics = computed(() =>
+  themesData.map((t) => ({
+    id: t.id,
+    name: props.language === "fr" ? t.fr : t.en,
+    icon: t.icon, 
   }))
-)
+);
+
+function goHome() {
+  router.push("/");
+}
+
+function goToCapture() {
+  router.push("/capture");
+}
+
+function selectObject(item) {
+  router.push({
+    path: "/themes",
+    state: { source: "list", type: "object", objectId: item.id, name: item.name },
+  });
+}
+
+function selectTopic(item) {
+  router.push({
+    path: "/themes",
+    state: { source: "list", type: "theme", themeId: item.id, name: item.name },
+  });
+}
+
 </script>
 
 <style scoped>
 .page {
-  min-height: 100vh;
-  position: relative;
+  height: 100%;
+  min-height: 0;
   overflow: hidden;
-  padding: clamp(20px, 3vw, 50px);
+  padding: clamp(16px, 2.5vw, 40px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #07070a;
-  color: rgba(255, 255, 255, 0.92);
 }
 
 .header {
@@ -97,6 +142,13 @@ const topics = ref(
   text-align: center;
   position: relative;
   z-index: 2;
+}
+
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
 }
 
 .title {
@@ -107,6 +159,12 @@ const topics = ref(
   text-shadow: 0 12px 34px rgba(0, 0, 0, 0.65);
 }
 
+.navButtons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
 .lists-wrapper {
   width: 100%;
   max-width: 1200px;
@@ -115,8 +173,10 @@ const topics = ref(
   gap: 50px;
   grid-template-columns: 1fr;
   flex: 1;
+  min-height: 0;     
   align-items: stretch;
 }
+
 /* Side-by-side on tablets and up */
 @media (min-width: 700px) {
   .lists-wrapper {
@@ -132,32 +192,71 @@ const topics = ref(
   box-shadow: 0 22px 70px rgba(0, 0, 0, 0.4);
   display: flex;
   flex-direction: column;
-  height: 70vh;
+  height: 100%;      
+  min-height: 0;     
 }
 
 .list-title {
   text-align: center;
   margin-bottom: 18px;
-  font-size: 1.3rem;
+  font-size: 2.0rem;
 }
 
 .scroll-list {
   flex: 1;
+  min-height: 0;     
   overflow-y: auto;
-  padding-right: 8px;
+  padding-right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.listItemText {
+  font-size: 20px;        
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .item {
-  padding: 14px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 14px 16px;
   border-radius: 12px;
-  margin-bottom: 10px;
+
   background: rgba(255, 255, 255, 0.06);
-  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.95);
+
   cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.item-icon {
+  width: 100px;      
+  height: 100px;     
+  object-fit: contain; 
+}
+
+.item:hover{
+  transform: scale(1.5);            
+  filter: brightness(1.2);      
+}
+
+.chev {
+  opacity: 0.75;
+  font-size: 22px;
 }
 
 .item:hover {
   transform: translateY(-2px);
   background: rgba(255, 255, 255, 0.12);
+  filter: brightness(1.2);      
 }
 </style>

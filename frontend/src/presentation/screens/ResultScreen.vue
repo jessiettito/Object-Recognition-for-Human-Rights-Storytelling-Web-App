@@ -1,14 +1,8 @@
 <template>
-  <main class="resultScreen" role="main" aria-label="Result screen">
-    <!-- Captured image as blurred background -->
-    <div class="backgroundLayers" aria-hidden="true">
-      <div class="backgroundPhoto" :style="backgroundImageStyle"></div>
-      <div class="backgroundPhotoBlur strongBlur" :style="backgroundImageStyle"></div>
-      <div class="backgroundDarkenOverlay"></div>
-    </div>
+  <main class=" screen resultScreen" role="main" aria-label="Result screen">
 
     <section class="contentArea" aria-labelledby="objectName">
-      <div class="resultCard">
+      <div class="resultCard panelCard">
         <!-- Circle preview on the side -->
         <div class="circlePreview" aria-label="Object preview">
           <img
@@ -24,12 +18,38 @@
         <div class="resultText">
           <h1 id="objectName" class="objectName">{{ objectNameText }}</h1>
 
-          <button class="mainButton startButton continueButton" type="button" @click="goToNextScreen">
+          <div v-if="results.length" class="choices" role="list" aria-label="Top detected objects">
+            <button
+              v-for="(item, idx) in results"
+              :key="item.name + idx"
+              class="choiceBtn"
+              type="button"
+              :aria-pressed="idx === selectedIndex"
+              @click="chooseIndex(idx)"
+            >
+              <span class="choiceName">{{ item.name }}</span>
+              <span class="choiceScore">{{ Math.round(item.confidence * 100) }}%</span>
+            </button>
+          </div>
+
+          <button class="startButton resultButton" type="button" @click="goToNextScreen">
             Continue
           </button>
 
-          <button class="mainButton secondaryButton tryAgainButton" type="button" @click="goBackToCapture">
+          <button 
+              v-if="!showListOption"
+              class="secondaryButton resultButton" 
+              type="button" 
+              @click="goBackToCapture">
             Try again
+          </button>
+
+          <button
+              v-if="showListOption"
+              class="startButton resultButton"
+              type="button"
+              @click="goToNextScreen">
+            Choose from list
           </button>
 
           <div v-if="confidenceText" class="smallMeta">{{ confidenceText }}</div>
@@ -40,8 +60,9 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
+import { objects as objectData } from "../../data/Objects.js";
 
 const router = useRouter();
 
@@ -51,11 +72,24 @@ const router = useRouter();
 const navigationState = computed(() => window.history.state || {});
 
 const capturedImageDataUrl = computed(() => navigationState.value.imageDataUrl || "");
-const detectedObjectLabel = computed(() => navigationState.value.label || "");
-const detectedObjectScore = computed(() => {
-  const score = navigationState.value.score;
-  return typeof score === "number" ? score : null;
+// New: list of results
+const results = computed(() => {
+  const r = navigationState.value.results;
+  return Array.isArray(r) ? r : [];
 });
+
+const RETRY_KEY = "objectDetectionRetries";
+const MAX_RETRIES = 3;
+const retryCount = ref(parseInt(localStorage.getItem(RETRY_KEY) || "0"));
+
+// Selected index (default to 0)
+const selectedIndex = ref(0);
+
+const showListOption = computed(() => retryCount.value >= MAX_RETRIES);
+
+const selected = computed(() => results.value[selectedIndex.value] || null);
+const detectedObjectLabel = computed(() => selected.value?.name || "");
+const detectedObjectScore = computed(() => selected.value?.confidence ?? null);
 
 const objectNameText = computed(() => {
   if (!detectedObjectLabel.value) return "Result";
@@ -67,34 +101,55 @@ const confidenceText = computed(() => {
   return `Confidence: ${Math.round(detectedObjectScore.value * 100)}%`;
 });
 
-const backgroundImageStyle = computed(() => ({
-  backgroundImage: capturedImageDataUrl.value ? `url("${capturedImageDataUrl.value}")` : "none",
-}));
+function chooseIndex(index) {
+  if (index >= 0 && index < results.value.length) {
+    selectedIndex.value = index;
+  }
+}
 
 function goBackToCapture() {
+  const nextCount = retryCount.value + 1;
+
+  retryCount.value = nextCount;
+  localStorage.setItem(RETRY_KEY, String(nextCount));
+
   router.push("/capture");
 }
 
-function goToNextScreen() {
-  // As of now moving to the list screen **** we will adding the theme screen here. *** for myself reminder...
-  router.push("/list");
+function resetRetryCount() {
+  retryCount.value = 0;
+  localStorage.removeItem(RETRY_KEY);
 }
+
+function goToNextScreen() {
+  resetRetryCount();
+
+  router.push({
+    path: "/themes",
+    state: {
+      source: "result",
+      type: "object",
+      objectId: selectedObjectId.value,
+      name: objectNameText.value,
+    },
+  });
+}
+
+const selectedObjectId = computed(() => {
+  const label = (detectedObjectLabel.value || "").toLowerCase().trim();
+
+  const matchedObject = objectData.find(
+    (item) =>
+      item.id.toLowerCase() === label ||
+      item.en.toLowerCase() === label
+  );
+
+  return matchedObject?.id || "";
+});
+
 </script>
 
 <style scoped>
-.resultScreen {
-  height: 100%;
-  width: 100%;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Background layers: photo, blurred photo, dark overlay */
-.strongBlur {
-  filter: blur(24px) !important;
-  opacity: 0.35 !important;
-}
-
 .contentArea {
   position: relative;
   z-index: 2;
@@ -158,12 +213,18 @@ function goToNextScreen() {
   text-shadow: 0 12px 34px rgba(0, 0, 0, 0.65);
 }
 
-.continueButton {
+.resultButton {
   margin-top: 16px;
-}
+  width: min(520px, 92vw);
+  margin-left: auto;
+  margin-right: auto;
 
-.tryAgainButton {
-  margin-top: 10px;
+  padding: 14px 18px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+
+  display: block;
 }
 
 .smallMeta {
@@ -185,5 +246,61 @@ function goToNextScreen() {
   .resultText {
     width: 100%;
   }
+}
+
+.choices {
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+  width: min(520px, 92vw);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.choiceBtn {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 12px 14px;
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.95);
+
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.choiceBtn:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.choiceBtn[aria-pressed="true"] {
+  background: rgba(167, 243, 208, 0.16);
+  border-color: rgba(167, 243, 208, 0.38);
+}
+
+.choiceName {
+  text-transform: capitalize;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.choiceScore {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.noResults {
+  margin-top: 14px;
+  font-size: 14px;
+  opacity: 0.9;
 }
 </style>

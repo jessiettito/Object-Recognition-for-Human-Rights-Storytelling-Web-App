@@ -50,23 +50,43 @@ function getBestPrediction(predictions) {
 }
 
 /**
- * Detects the main object in an image element.
+ * Detects top N objects in an image element.
  * @param {HTMLImageElement} imageElement
- * @returns {Promise<{name: string, confidence: number} | null>}
+ * @param {{ topK?: number, ignorePerson?: boolean, minScore?: number }} options
+ * @returns {Promise<Array<{ name: string, confidence: number }>>}
  */
-export async function detectMainObject(imageElement) {
+export async function detectTopObjects(imageElement, options = {}) {
+  const { topK = 5, ignorePerson = true, minScore = 0.0 } = options;
+
   await initializeBackendIfNeeded();
   const model = await loadModelIfNeeded();
+
   const predictions = await model.detect(imageElement);
 
-  // If "person" appears, try to ignore it. since their confidence will be higher than object. 
-  const predictionsWithoutPeople = predictions.filter((p) => p.class !== "person");
-  const best = getBestPrediction(predictionsWithoutPeople.length ? predictionsWithoutPeople : predictions);
+  // 1) basic filtering (score)
+  const filtered = (predictions || [])
+    .filter((p) => p && typeof p.score === "number")
+    .filter((p) => p.score >= minScore);
 
-  if (!best) return null;
+  // 2) optional: ignore person, but FALLBACK to person if nothing else exists
+  const withoutPerson = filtered.filter((p) => p.class !== "person");
+  const finalList =
+    ignorePerson && withoutPerson.length > 0 ? withoutPerson : filtered;
 
-  return {
-    name: best.class,
-    confidence: best.score,
-  };
+  // 3) sort + take topK
+  return finalList
+    .sort((a, b) => b.score - a.score)
+    .slice(0, topK)
+    .map((p) => ({
+      name: p.class,
+      confidence: p.score,
+    }));
+}
+
+/**
+ * Backwards compatible helper: returns best object only.
+ */
+export async function detectMainObject(imageElement) {
+  const top = await detectTopObjects(imageElement, { topK: 1, ignorePerson: true });
+  return top.length ? top[0] : null;
 }
