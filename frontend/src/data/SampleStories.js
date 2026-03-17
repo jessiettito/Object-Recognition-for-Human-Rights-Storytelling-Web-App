@@ -18,8 +18,9 @@ export const sampleStories = [
       fr: "Une réflexion sur la faim, la dignité et l'accès aux systèmes de soutien en période d'incertitude.",
     },
     full: {
-      en: "TODO: full story in English.",
-      fr: "TODO : histoire complète en français.",
+      type: "url",
+      en: "https://droitsdelapersonne.ca/histoire/lexperience-mincome-au-manitoba",
+      fr: "https://droitsdelapersonne.ca/histoire/lexperience-mincome-au-manitoba",
     },
   },
   {
