@@ -14,11 +14,16 @@
 
         <article class="storyBody" aria-label="Story text">
           <template v-if="fullType === 'url' && fullUrl">
-          <a class="externalLink" :href="fullUrl" target="_blank" rel="noopener noreferrer">
-            {{ props.language === "fr" ? "Ouvrir l’histoire" : "Open story" }}
-          </a>
-
-          <iframe class="storyFrame" :src="fullUrl" title="Story content"></iframe>
+            <a class="externalLink" :href="fullUrl" target="_blank" rel="noopener noreferrer">
+              {{ props.language === "fr" ? "Ouvrir l’histoire" : "Open story" }}
+            </a>
+            <p class="hintText">
+              {{
+                props.language === "fr"
+                  ? "Cette histoire s’ouvre dans un nouvel onglet."
+                  : "This story opens in a new tab."
+              }}
+            </p>
           </template>
 
           <template v-else>
@@ -90,24 +95,29 @@ const objectLabel = computed(() => {
   return id ? findLabel(objects, id) : "";
 });
 
-const fullRaw = computed(() => getStoryInfo(story.value?.full) || null);
+const fullRaw = computed(() => story.value?.full || null);
+
+const fullValue = computed(() => {
+  // fullRaw is the object {type,en,fr} or {en,fr} or null
+  return getStoryInfo(fullRaw.value);
+});
 
 const fullType = computed(() => {
   const t = fullRaw.value?.type;
   if (typeof t === "string" && t.toLowerCase() === "url") return "url";
   // Back-compat: if full is just a URL string in en/fr, treat as url
-  const maybe = getStoryInfo(fullRaw.value);
+  const maybe = fullValue.value;
   return isProbablyUrl(maybe) ? "url" : "text";
 });
 
 const fullUrl = computed(() => {
   if (fullType.value !== "url") return "";
-  return getStoryInfo(fullRaw.value);
+  return fullValue.value.trim();
 });
 
 const fullText = computed(() => {
   if (fullType.value !=="text") return "";
-  const text = getStoryInfo(fullRaw.value);
+  const text = fullValue.value;
   return text || getStoryInfo(story.value?.full);
 });
 
@@ -116,7 +126,7 @@ function isProbablyUrl(s) {
 }
 
 const paragraphs = computed(() =>
-  fullText.value
+  (fullText.value || "")
     .split(/\n\s*\n/g)
     .map((p) => p.trim())
     .filter(Boolean)
@@ -193,6 +203,12 @@ function goToThemes() {
   display: inline-block;
   margin-bottom: 12px;
   font-weight: 700;
+}
+
+.hintText {
+  margin: 12px 0 0 0;
+  font-size: 13px;
+  opacity: 0.85;
 }
 
 @media (max-width: 768px) {
