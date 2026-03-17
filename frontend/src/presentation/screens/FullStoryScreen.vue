@@ -13,9 +13,19 @@
         <p class="storyAuthor">{{ screenText.by }} {{ author }}</p>
 
         <article class="storyBody" aria-label="Story text">
-          <p v-for="(para, idx) in paragraphs" :key="idx" class="storyParagraph">
-            {{ para }}
-          </p>
+          <template v-if="fullType === 'url' && fullUrl">
+          <a class="externalLink" :href="fullUrl" target="_blank" rel="noopener noreferrer">
+            {{ props.language === "fr" ? "Ouvrir l’histoire" : "Open story" }}
+          </a>
+
+          <iframe class="storyFrame" :src="fullUrl" title="Story content"></iframe>
+          </template>
+
+          <template v-else>
+            <p v-for="(para, idx) in paragraphs" :key="idx" class="storyParagraph">
+              {{ para }}
+            </p>
+          </template>
         </article>
 
         <div class="modalButtons">
@@ -80,7 +90,31 @@ const objectLabel = computed(() => {
   return id ? findLabel(objects, id) : "";
 });
 
-const fullText = computed(() => getStoryInfo(story.value?.full));
+const fullRaw = computed(() => getStoryInfo(story.value?.full) || null);
+
+const fullType = computed(() => {
+  const t = fullRaw.value?.type;
+  if (typeof t === "string" && t.toLowerCase() === "url") return "url";
+  // Back-compat: if full is just a URL string in en/fr, treat as url
+  const maybe = getStoryInfo(fullRaw.value);
+  return isProbablyUrl(maybe) ? "url" : "text";
+});
+
+const fullUrl = computed(() => {
+  if (fullType.value !== "url") return "";
+  return getStoryInfo(fullRaw.value);
+});
+
+const fullText = computed(() => {
+  if (fullType.value !=="text") return "";
+  const text = getStoryInfo(fullRaw.value);
+  return text || getStoryInfo(story.value?.full);
+});
+
+function isProbablyUrl(s) {
+  return /^https?:\/\/\S+$/i.test((s || "").trim());
+}
+
 const paragraphs = computed(() =>
   fullText.value
     .split(/\n\s*\n/g)
@@ -145,6 +179,20 @@ function goToThemes() {
 
 .storyParagraph:last-child {
   margin-bottom: 0;
+}
+
+.storyFrame {
+  width: 100%;
+  height: min(70vh, 820px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  background: rgba(0,0,0,0.25);
+}
+
+.externalLink {
+  display: inline-block;
+  margin-bottom: 12px;
+  font-weight: 700;
 }
 
 @media (max-width: 768px) {
