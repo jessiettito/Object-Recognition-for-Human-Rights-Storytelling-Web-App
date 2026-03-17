@@ -9,12 +9,12 @@ import FullStoryScreen from './presentation/screens/FullStoryScreen.vue';
 
 const routes = [
   { path: '/', component: WelcomeScreen },
-  { path: "/capture", component: CaptureScreen },
+  { path: '/capture', component: CaptureScreen },
   { path: '/list', component: ListScreen },
   { path: '/story', component: StoryScreen },
   { path: '/result', component: ResultScreen },
   { path: '/themes', component: ThemesScreen },
-  { path: "/stories/:storyId", component: FullStoryScreen, props: true },
+  { path: '/stories/:storyId', component: FullStoryScreen },
 ]
 
 const router = createRouter({
