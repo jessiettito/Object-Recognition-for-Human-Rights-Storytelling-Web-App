@@ -244,6 +244,11 @@ function selectTopic(item) {
   object-fit: contain; 
 }
 
+.item:hover{
+  transform: scale(1.5);            
+  filter: brightness(1.2);      
+}
+
 .chev {
   opacity: 0.75;
   font-size: 22px;
@@ -252,5 +257,6 @@ function selectTopic(item) {
 .item:hover {
   transform: translateY(-2px);
   background: rgba(255, 255, 255, 0.12);
+  filter: brightness(1.2);      
 }
 </style>
