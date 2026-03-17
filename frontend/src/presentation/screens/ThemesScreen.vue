@@ -7,9 +7,33 @@
         <h1 id="title" class="title">{{ screenText.title }}</h1>
 
         <!-- Show selected object/theme information -->
-        <div v-if="selectionText" class="selection">
-          <span class="pill">{{ selectionText }}</span>
-        </div>
+        <!-- THEME ONLY -->
+<div v-if="!selectedObjectId && currentTheme" class="selection columnLayout">
+  <img
+    :src="`/icons/${currentTheme.icon}`"
+    :alt="currentTheme.name"
+    class="themeIcon"
+  />
+
+  <span class="pill">{{ selectionText }}</span>
+</div>
+
+<!-- OBJECT + THEME -->
+<div v-else-if="selectedObjectId && currentTheme" class="selection">
+  <img
+    :src="`/icons/${getObjectIcon(selectedObjectId)}`"
+    :alt="selectedName"
+    class="objectIcon"
+  />
+
+  <span class="pill">{{ selectionText }}</span>
+
+  <img
+    :src="`/icons/${currentTheme.icon}`"
+    :alt="currentTheme.name"
+    class="themeIcon"
+  />
+</div>
  
         <!-- Display theme and reflective prompt -->
         <div v-if="currentTheme" class="themeContent">
@@ -193,6 +217,27 @@ function getReflectivePrompt(themeId) {
   return languagePrompts[randomIndex];
 }
 
+const objectsList = computed(() =>
+  objects.map(o => ({
+    id: o.id,
+    name: props.language === "fr" ? o.fr : o.en,
+    icon: o.icon,
+  }))
+);
+
+const themesList = computed(() =>
+  themes.map(t => ({
+    id: t.id,
+    name: props.language === "fr" ? t.fr : t.en,
+    icon: t.icon,
+  }))
+);
+
+function getObjectIcon(objectId) {
+  const obj = objectsList.value.find(o => o.id === objectId);
+  return obj?.icon || "";
+}
+
 function goToStory() {
   router.push("/story");
 }
@@ -332,6 +377,33 @@ function goToList() {
 
 .popupCancel:hover {
   opacity: 0.7;
+}
+
+.selection {
+  display: flex;
+  align-items: center;       /* vertically center the icons and bubble */
+  justify-content: center;   /* center horizontally in the card */
+  gap: 24px;                 /* more space between object icon, bubble, theme icon */
+  margin: 16px 0;
+}
+
+.selection .objectIcon,
+.selection .themeIcon {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  transition: transform 0.2s ease, filter 0.2s ease;
+
+}
+
+.selection .objectIcon:hover,
+.selection .themeIcon:hover {
+  transform: scale(1.1);            
+  filter: brightness(1.2);      
+}
+
+.selection.columnLayout {
+  flex-direction: column;
 }
 
 </style>
