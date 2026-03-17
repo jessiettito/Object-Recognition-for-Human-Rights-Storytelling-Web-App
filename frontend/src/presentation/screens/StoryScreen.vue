@@ -89,7 +89,7 @@ function getStoryInfo(storyCategory) {
 }
 
 function openStory(storyId) {
-  router.push(`/story/${storyId}`);
+  router.push(`/stories/${storyId}`);
 }
 
 function goBack() {
