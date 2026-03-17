@@ -17,6 +17,10 @@ export const sampleStories = [
       en: "A reflection on hunger, dignity, and access to support systems during times of uncertainty.",
       fr: "Une réflexion sur la faim, la dignité et l'accès aux systèmes de soutien en période d'incertitude.",
     },
+    full: {
+      en: "TODO: full story in English.",
+      fr: "TODO : histoire complète en français.",
+    },
   },
   {
     id: "story-2",
@@ -36,6 +40,10 @@ export const sampleStories = [
       en: "A personal object becomes a symbol of movement, memory, and the search for home.",
       fr: "Un objet personnel devient un symbole de déplacement, de mémoire et de recherche d'un foyer.",
     },
+    full: {
+      en: "TODO: full story in English.",
+      fr: "TODO : histoire complète en français.",
+    },
   },
   {
     id: "story-3",
@@ -54,6 +62,10 @@ export const sampleStories = [
     summary: {
       en: "Clothing, culture, and self-expression reveal how rights and identity intersect in daily life.",
       fr: "Les vêtements, la culture et l'expression de soi montrent comment les droits et l'identité se croisent dans la vie quotidienne.",
+    },
+    full: {
+      en: "TODO: full story in English.",
+      fr: "TODO : histoire complète en français.",
     },
   },
 ];
