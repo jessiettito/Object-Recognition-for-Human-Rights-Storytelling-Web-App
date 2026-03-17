@@ -34,9 +34,9 @@
 <script setup>
 import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { sampleStories } from "../../data/stories/sampleStories";
-import { themes } from "../../data/themes";
-import { objects } from "../../data/objects";
+import { sampleStories } from "../../data/SampleStories";
+import { themes } from "../../data/Themes";
+import { objects } from "../../data/Objects";
 
 const props = defineProps({
   language: { type: String, default: "en" },
@@ -55,9 +55,9 @@ const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr :
 const storyId = computed(() => String(route.params.storyId || ""));
 const story = computed(() => sampleStories.find((s) => s.id === storyId.value));
 
-function pickLocalized(localized) {
-  if (!localized) return "";
-  return props.language === "fr" ? localized.fr : localized.en;
+function getStoryInfo(storyField) {
+  if (!storyField) return "";
+  return props.language === "fr" ? storyField.fr : storyField.en;
 }
 
 function findLabel(list, id) {
@@ -66,9 +66,9 @@ function findLabel(list, id) {
   return props.language === "fr" ? item.fr : item.en;
 }
 
-const title = computed(() => pickLocalized(story.value?.title) || "Story");
-const category = computed(() => pickLocalized(story.value?.category));
-const author = computed(() => pickLocalized(story.value?.author));
+const title = computed(() => getStoryInfo(story.value?.title) || "Story");
+const category = computed(() => getStoryInfo(story.value?.category));
+const author = computed(() => getStoryInfo(story.value?.author));
 
 const themeLabel = computed(() => {
   const id = story.value?.themeIds?.[0];
@@ -80,7 +80,7 @@ const objectLabel = computed(() => {
   return id ? findLabel(objects, id) : "";
 });
 
-const fullText = computed(() => pickLocalized(story.value?.full));
+const fullText = computed(() => getStoryInfo(story.value?.full));
 const paragraphs = computed(() =>
   fullText.value
     .split(/\n\s*\n/g)
@@ -122,17 +122,6 @@ function goToThemes() {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-}
-
-.pill {
-  display: inline-block;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 
 .storyAuthor {
