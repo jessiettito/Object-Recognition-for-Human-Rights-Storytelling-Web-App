@@ -35,11 +35,8 @@
         </div>
 
         <div class="modalButtons">
-          <button class="mainButton startButton" type="button" @click="goBack">
-            {{ screenText.back }}
-          </button>
-
-          <button class="mainButton secondaryButton" type="button" @click="goToThemes">
+      
+          <button class="mainButton startButton" type="button" @click="goToList">
             {{ screenText.themes }}
           </button>
         </div>
@@ -65,16 +62,14 @@ const textByLanguage = {
     storyLabel: "Story",
     by: "By",
     explore: "Explore Story",
-    back: "Back",
-    themes: "Back to themes",
+    themes: "Back to List",
   },
   fr: {
     title: "Histoires",
     storyLabel: "Histoire",
     by: "Par",
     explore: "Explorer l'histoire",
-    back: "Retour",
-    themes: "Retour aux thèmes",
+    themes: "Retour à la liste",
   },
 };
 
@@ -92,12 +87,8 @@ function openStory(storyId) {
   router.push(`/story/${storyId}`);
 }
 
-function goBack() {
-  router.back();
-}
-
-function goToThemes() {
-  router.push("/themes");
+function goToList() {
+  router.push("/list");
 }
 </script>
 
