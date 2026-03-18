@@ -10,7 +10,7 @@
           <span class="pill" v-if="objectLabel">{{ objectLabel }}</span>
         </div>
 
-        <p class="storyAuthor">{{ screenText.by }} {{ author }}</p>
+        <p v-if="author" class="storyAuthor">{{ screenText.by }} {{ author }}</p>
 
         <article class="storyBody" aria-label="Story text">
           <template v-if="fullType === 'url' && fullUrl">
@@ -86,7 +86,7 @@ const category = computed(() => getStoryInfo(story.value?.category));
 const author = computed(() => getStoryInfo(story.value?.author));
 
 const themeLabel = computed(() => {
-  const id = story.value?.themeIds?.[0];
+  const id = story.value?.theme?.[0];
   return id ? findLabel(themes, id) : "";
 });
 
@@ -137,7 +137,7 @@ function goBack() {
 }
 
 function goToThemes() {
-  router.push("/themes");
+  router.push("/list");
 }
 </script>
 
