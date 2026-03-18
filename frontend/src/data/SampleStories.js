@@ -69,71 +69,139 @@ export const sampleStories = [
     },
   },
   {
-    "id": "story-4",
-    "title": {
-      "en": "Freedom from Want",
-      "fr": "Être à l’abri du besoin"
+    id: "story-4",
+    title: {
+      en: "Freedom from Want",
+      fr: "Être à l’abri du besoin"
     },
-    "theme": ["standard_of_living", "health"],
-    "category": {
-      "en": "Standard of Living",
-      "fr": "Niveau de vie"
+    theme: ["standard_of_living", "health"],
+    category: {
+      en: "Standard of Living",
+      fr: "Niveau de vie"
     },
-    "summary": {
-      "en": "Across Canada, many people face the daily reality of not having enough to eat. Despite living in a country with abundant resources, individuals and families often rely on food banks to get by, not out of choice but out of necessity. Rising living costs, unstable employment, and low wages force difficult decisions—pay rent or buy groceries, cover bills or feed a family. For parents, this can mean going without meals so their children can eat. Over time, this constant pressure affects both physical health and mental well-being, eroding a person’s sense of dignity. Access to adequate and nutritious food is recognized as a basic human right, yet persistent inequality continues to leave many without it. Ensuring that everyone can live with dignity requires long-term solutions that address poverty and strengthen social support systems.",
-      "fr": "Partout au Canada, de nombreuses personnes vivent la réalité quotidienne de ne pas avoir assez à manger. Malgré l’abondance des ressources, des familles dépendent des banques alimentaires non pas par choix, mais par nécessité. La hausse du coût de la vie, l’instabilité de l’emploi et les faibles revenus obligent à faire des choix difficiles : payer le loyer ou acheter de la nourriture. Certains parents sautent des repas pour que leurs enfants puissent manger. Avec le temps, cette pression constante affecte la santé physique et mentale, ainsi que le sentiment de dignité. L’accès à une alimentation suffisante et nutritive est pourtant un droit fondamental, mais les inégalités persistantes empêchent encore de nombreuses personnes d’en bénéficier. Garantir ce droit nécessite des solutions durables pour lutter contre la pauvreté et renforcer les systèmes de soutien."
+    summary: {
+      en: "Across Canada, many people face the daily reality of not having enough to eat. Despite living in a country with abundant resources, individuals and families often rely on food banks to get by, not out of choice but out of necessity. Rising living costs, unstable employment, and low wages force difficult decisions—pay rent or buy groceries, cover bills or feed a family. For parents, this can mean going without meals so their children can eat. Over time, this constant pressure affects both physical health and mental well-being, eroding a person’s sense of dignity. Access to adequate and nutritious food is recognized as a basic human right, yet persistent inequality continues to leave many without it. Ensuring that everyone can live with dignity requires long-term solutions that address poverty and strengthen social support systems.",
+      fr: "Partout au Canada, de nombreuses personnes vivent la réalité quotidienne de ne pas avoir assez à manger. Malgré l’abondance des ressources, des familles dépendent des banques alimentaires non pas par choix, mais par nécessité. La hausse du coût de la vie, l’instabilité de l’emploi et les faibles revenus obligent à faire des choix difficiles : payer le loyer ou acheter de la nourriture. Certains parents sautent des repas pour que leurs enfants puissent manger. Avec le temps, cette pression constante affecte la santé physique et mentale, ainsi que le sentiment de dignité. L’accès à une alimentation suffisante et nutritive est pourtant un droit fondamental, mais les inégalités persistantes empêchent encore de nombreuses personnes d’en bénéficier. Garantir ce droit nécessite des solutions durables pour lutter contre la pauvreté et renforcer les systèmes de soutien."
     },
-    "link": "https://humanrights.ca/story/freedom-want"
+    link: "https://humanrights.ca/story/freedom-want"
   },
   {
-    "id": "story-5",
-    "title": {
-      "en": "Persecution of Queer Canadian Soldiers in Wartime",
-      "fr": "Persécution des militaires canadiens LGBTQ+ en temps de guerre"
+    id: "story-5",
+    title: {
+      en: "Persecution of Queer Canadian Soldiers in Wartime",
+      fr: "Persécution des militaires canadiens LGBTQ+ en temps de guerre"
     },
-    "theme": ["sexual_orientation", "discrimination"],
-    "category": {
-      "en": "Sexual Orientation",
-      "fr": "Orientation sexuelle"
+    theme: ["sexual_orientation", "discrimination"],
+    category: {
+      en: "Sexual Orientation",
+      fr: "Orientation sexuelle"
     },
-    "summary": {
-      "en": "During the Cold War, many members of the Canadian military lived in fear of being exposed for their sexual orientation. Those suspected of being gay or lesbian were subjected to invasive interrogations and surveillance. Personal relationships were scrutinized, and individuals were pressured to confess or identify others. Many lost their careers overnight, removed from service despite their commitment and dedication. Beyond the professional consequences, the emotional toll was lasting, marked by shame, isolation, and a sense of betrayal. These actions were justified at the time as protecting national security, but they caused deep and lasting harm. Years later, efforts to acknowledge these injustices and provide apologies represent important steps toward restoring dignity.",
-      "fr": "Pendant la guerre froide, de nombreux membres des forces armées canadiennes vivaient dans la peur d’être exposés en raison de leur orientation sexuelle. Les personnes soupçonnées d’être homosexuelles faisaient l’objet d’interrogatoires intrusifs et de surveillance. Leurs relations personnelles étaient examinées, et on les poussait à avouer ou à dénoncer d’autres personnes. Beaucoup ont perdu leur carrière du jour au lendemain, malgré leur engagement envers leur pays. Au-delà des conséquences professionnelles, l’impact émotionnel a été profond, marqué par la honte, l’isolement et un sentiment de trahison. Ces pratiques étaient alors justifiées par des raisons de sécurité nationale, mais elles ont causé des torts durables. Aujourd’hui, les reconnaissances officielles et les excuses constituent des étapes importantes vers la réparation."
+    summary: {
+      en: "During the Cold War, many members of the Canadian military lived in fear of being exposed for their sexual orientation. Those suspected of being gay or lesbian were subjected to invasive interrogations and surveillance. Personal relationships were scrutinized, and individuals were pressured to confess or identify others. Many lost their careers overnight, removed from service despite their commitment and dedication. Beyond the professional consequences, the emotional toll was lasting, marked by shame, isolation, and a sense of betrayal. These actions were justified at the time as protecting national security, but they caused deep and lasting harm. Years later, efforts to acknowledge these injustices and provide apologies represent important steps toward restoring dignity.",
+      fr: "Pendant la guerre froide, de nombreux membres des forces armées canadiennes vivaient dans la peur d’être exposés en raison de leur orientation sexuelle. Les personnes soupçonnées d’être homosexuelles faisaient l’objet d’interrogatoires intrusifs et de surveillance. Leurs relations personnelles étaient examinées, et on les poussait à avouer ou à dénoncer d’autres personnes. Beaucoup ont perdu leur carrière du jour au lendemain, malgré leur engagement envers leur pays. Au-delà des conséquences professionnelles, l’impact émotionnel a été profond, marqué par la honte, l’isolement et un sentiment de trahison. Ces pratiques étaient alors justifiées par des raisons de sécurité nationale, mais elles ont causé des torts durables. Aujourd’hui, les reconnaissances officielles et les excuses constituent des étapes importantes vers la réparation."
     },
-    "link": "https://humanrights.ca/story/persecution-queer-canadian-soldiers-wartime"
+    link: "https://humanrights.ca/story/persecution-queer-canadian-soldiers-wartime"
   },
   {
-    "id": "story-6",
-    "title": {
-      "en": "The Impact of War on Children Worldwide",
-      "fr": "Les effets de la guerre sur les enfants dans le monde"
+    id: "story-6",
+    title: {
+      en: "The Impact of War on Children Worldwide",
+      fr: "Les effets de la guerre sur les enfants dans le monde"
     },
-    "theme": ["children", "refugee"],
-    "category": {
-      "en": "Children",
-      "fr": "Enfants"
+    theme: ["children", "refugee"],
+    category: {
+      en: "Children",
+      fr: "Enfants"
     },
-    "summary": {
-      "en": "For children living in conflict zones, daily life is shaped by uncertainty and loss. Homes are destroyed, families are separated, and entire communities are forced to flee. In unfamiliar environments, children must adapt without the stability they once knew. Many lose access to education and healthcare, while others are exposed directly to violence. Some are even recruited into armed groups. These experiences leave lasting effects on their development, sense of safety, and future opportunities. Protecting children in times of war requires global commitment to ensuring their rights to safety, education, and a stable future.",
-      "fr": "Pour les enfants vivant dans des zones de conflit, le quotidien est marqué par l’incertitude et la perte. Les maisons sont détruites, les familles séparées et des communautés entières sont contraintes de fuir. Dans des environnements inconnus, les enfants doivent s’adapter sans la stabilité qu’ils connaissaient. Beaucoup perdent l’accès à l’éducation et aux soins de santé, tandis que d’autres sont exposés directement à la violence. Certains sont même recrutés par des groupes armés. Ces expériences ont des conséquences durables sur leur développement, leur sentiment de sécurité et leurs perspectives d’avenir. Protéger les enfants en temps de guerre nécessite un engagement mondial pour garantir leurs droits fondamentaux."
+    summary: {
+      en: "For children living in conflict zones, daily life is shaped by uncertainty and loss. Homes are destroyed, families are separated, and entire communities are forced to flee. In unfamiliar environments, children must adapt without the stability they once knew. Many lose access to education and healthcare, while others are exposed directly to violence. Some are even recruited into armed groups. These experiences leave lasting effects on their development, sense of safety, and future opportunities. Protecting children in times of war requires global commitment to ensuring their rights to safety, education, and a stable future.",
+      fr: "Pour les enfants vivant dans des zones de conflit, le quotidien est marqué par l’incertitude et la perte. Les maisons sont détruites, les familles séparées et des communautés entières sont contraintes de fuir. Dans des environnements inconnus, les enfants doivent s’adapter sans la stabilité qu’ils connaissaient. Beaucoup perdent l’accès à l’éducation et aux soins de santé, tandis que d’autres sont exposés directement à la violence. Certains sont même recrutés par des groupes armés. Ces expériences ont des conséquences durables sur leur développement, leur sentiment de sécurité et leurs perspectives d’avenir. Protéger les enfants en temps de guerre nécessite un engagement mondial pour garantir leurs droits fondamentaux."
     },
-    "link": "https://humanrights.ca/story/impact-war-children-worldwide"
+    link: "https://humanrights.ca/story/impact-war-children-worldwide"
   },
   {
-    "id": "story-7",
-    "title": {
-      "en": "What Is Two-Spirit? Part One: Origins",
-      "fr": "Qu’est-ce que l’identité bispirituelle ? Partie 1 : Origines"
+    id: "story-7",
+    title: {
+      en: "What Is Two-Spirit? Part One: Origins",
+      fr: "Qu’est-ce que l’identité bispirituelle ? Partie 1 : Origines"
     },
-    "theme": ["indigenous", "gender_identity", "culture_identity"],
-    "category": {
-      "en": "Indigenous",
-      "fr": "Autochtones"
+    theme: ["indigenous", "gender_identity", "culture_identity"],
+    category: {
+      en: "Indigenous",
+      fr: "Autochtones"
     },
-    "summary": {
-      "en": "Long before European contact, many Indigenous cultures recognized a diversity of gender identities and roles. People now described as Two-Spirit often held respected positions within their communities, contributing to spiritual and social life. Colonization disrupted these traditions by imposing rigid gender norms and suppressing Indigenous ways of understanding identity. Over time, this led to marginalization and loss of cultural knowledge. Today, efforts are being made to reclaim these identities and restore recognition of the diversity that has always existed within Indigenous communities.",
-      "fr": "Bien avant le contact avec les Européens, de nombreuses cultures autochtones reconnaissaient une diversité d’identités et de rôles de genre. Les personnes aujourd’hui appelées bispirituelles occupaient souvent des rôles respectés au sein de leur communauté, contribuant à la vie sociale et spirituelle. La colonisation a perturbé ces traditions en imposant des normes de genre rigides et en supprimant les façons autochtones de comprendre l’identité. Cela a entraîné une marginalisation et une perte de savoir culturel. Aujourd’hui, des efforts sont déployés pour redonner vie à ces identités et reconnaître la diversité qui a toujours existé.",
+    summary: {
+      en: "Long before European contact, many Indigenous cultures recognized a diversity of gender identities and roles. People now described as Two-Spirit often held respected positions within their communities, contributing to spiritual and social life. Colonization disrupted these traditions by imposing rigid gender norms and suppressing Indigenous ways of understanding identity. Over time, this led to marginalization and loss of cultural knowledge. Today, efforts are being made to reclaim these identities and restore recognition of the diversity that has always existed within Indigenous communities.",
+      fr: "Bien avant le contact avec les Européens, de nombreuses cultures autochtones reconnaissaient une diversité d’identités et de rôles de genre. Les personnes aujourd’hui appelées bispirituelles occupaient souvent des rôles respectés au sein de leur communauté, contribuant à la vie sociale et spirituelle. La colonisation a perturbé ces traditions en imposant des normes de genre rigides et en supprimant les façons autochtones de comprendre l’identité. Cela a entraîné une marginalisation et une perte de savoir culturel. Aujourd’hui, des efforts sont déployés pour redonner vie à ces identités et reconnaître la diversité qui a toujours existé.",
     },
-    "link": "https://humanrights.ca/story/what-two-spirit-part-one-origins"
+    link: "https://humanrights.ca/story/what-two-spirit-part-one-origins"
+  },
+  {
+    id: "story-8",
+    title: {
+      en: "Black Lives Matter and the Struggle for Racial Justice in Canada",
+      fr: "Black Lives Matter et la lutte pour la justice raciale au Canada"
+    },
+    theme: ["discrimination", "political"],
+    category: {
+      en: "Discrimination",
+      fr: "Discrimination"
+    },
+    summary: {
+      en: "Across Canada, Black communities continue to experience systemic racism that affects many aspects of daily life. Encounters with law enforcement, access to employment opportunities, and experiences within the education system are often shaped by long-standing inequalities. Moments of injustice have sparked protests and brought people together to demand accountability and meaningful change. Inspired by global movements, individuals and communities have raised their voices to challenge discrimination and call for reforms. These efforts highlight the importance of recognizing systemic barriers and working collectively to build a society where fairness and equal opportunity are truly accessible to all.",
+      fr: "Partout au Canada, les communautés noires continuent de faire face à un racisme systémique qui influence de nombreux aspects de la vie quotidienne. Les interactions avec les forces de l’ordre, l’accès à l’emploi et les expériences dans le système éducatif sont souvent marqués par des inégalités profondes. Des situations d’injustice ont donné lieu à des manifestations et ont mobilisé des communautés entières pour exiger des changements concrets. Inspirées par des mouvements mondiaux, ces voix s’élèvent pour dénoncer la discrimination et réclamer des réformes. Ces efforts soulignent l’importance de reconnaître les barrières systémiques et de travailler ensemble pour bâtir une société plus équitable."
+    },
+    link: "https://humanrights.ca/story/black-lives-matter-and-struggle-racial-justice-canada"
+  },
+  {
+    id: "story-9",
+    title: {
+      en: "My Future Children Will Never Get to Experience the Home I Knew",
+      fr: "Mes futurs enfants ne connaîtront jamais le chez-moi que j’ai connu"
+    },
+    theme: ["refugee", "migrant"],
+    category: {
+      en: "Refugee",
+      fr: "Personnes réfugiées"
+    },
+    summary: {
+      en: "Leaving home because of conflict or instability means losing more than a place—it means losing a sense of belonging. Familiar streets, traditions, and daily routines are left behind, often with no chance of return. Adjusting to a new country brings uncertainty, as individuals must rebuild their lives in unfamiliar surroundings. While new opportunities can emerge, the emotional weight of displacement remains. The realization that future children will never experience the same home, culture, or memories can be deeply painful. Even as new roots are formed, the connection to what was lost continues to shape identity and perspective.",
+      fr: "Quitter son pays en raison de conflits ou d’instabilité, c’est perdre bien plus qu’un lieu : c’est perdre un sentiment d’appartenance. Les rues familières, les traditions et le quotidien sont laissés derrière, souvent sans possibilité de retour. S’adapter à un nouveau pays apporte son lot d’incertitudes, alors qu’il faut reconstruire sa vie dans un environnement inconnu. Même si de nouvelles opportunités apparaissent, le poids émotionnel du déplacement demeure. Savoir que ses futurs enfants ne connaîtront jamais ce lieu, cette culture ou ces souvenirs peut être profondément douloureux. Malgré tout, ces expériences façonnent une nouvelle identité.",
+    },
+    link: "https://humanrights.ca/story/my-future-children-will-never-get-experience-home-i-knew"
+  },
+  {
+    id: "story-10",
+    title: {
+      en: "Online Misogyny: The Manosphere",
+      fr: "La misogynie en ligne : la « manosphère »"
+    },
+    theme: ["women", "discrimination", "gender_identity"],
+    category: {
+      en: "Women",
+      fr: "Femmes"
+    },
+    summary: {
+      en: "In some online spaces, communities have formed around ideas that promote hostility toward women. These environments often reinforce harmful stereotypes and normalize disrespect and exclusion. Over time, repeated exposure to these messages can influence how individuals think and act, shaping attitudes that extend beyond the digital world. The effects are not limited to those directly targeted; they impact broader efforts to create equality and respect in society. Addressing these challenges requires awareness, critical thinking, and a commitment to fostering online spaces that value dignity and inclusion.",
+      fr: "Dans certains espaces en ligne, des communautés se sont formées autour d’idées qui encouragent l’hostilité envers les femmes. Ces environnements renforcent souvent des stéréotypes nuisibles et normalisent le manque de respect et l’exclusion. Avec le temps, l’exposition répétée à ces messages peut influencer les attitudes et les comportements, bien au-delà du monde numérique. Les effets ne touchent pas seulement les personnes visées, mais l’ensemble de la société. Pour contrer ces tendances, il est essentiel de promouvoir l’esprit critique, la sensibilisation et des espaces numériques respectueux et inclusifs.",
+    },
+    "link": "https://humanrights.ca/story/online-misogyny-manosphere"
+  },
+  {
+    id: "story-11",
+    title: {
+      en: "Gender-Based Violence Across Canada",
+      fr: "La violence fondée sur le genre au Canada"
+    },
+    theme: ["women", "health", "shelter"],
+    category: {
+      en: "Women",
+      fr: "Femmes"
+    },
+    summary: {
+      en: "Gender-based violence affects people across Canada in many different forms, often occurring behind closed doors or in everyday environments. Survivors may experience physical harm, emotional abuse, or ongoing fear, and many face barriers when seeking help. Stigma, lack of resources, and concerns about safety can prevent individuals from speaking out. The impact extends beyond individuals, affecting families and communities as a whole. Efforts to address this issue include strengthening legal protections, expanding support services, and promoting education that challenges harmful attitudes. Creating meaningful change requires a collective commitment to ensuring safety, respect, and equality.",
+      fr: "La violence fondée sur le genre touche de nombreuses personnes au Canada sous différentes formes, souvent dans des contextes privés ou quotidiens. Les survivant·e·s peuvent subir des violences physiques, psychologiques ou vivre dans la peur constante. De nombreux obstacles, comme la stigmatisation, le manque de ressources ou les préoccupations liées à la sécurité, rendent difficile la recherche d’aide. Les conséquences dépassent les individus et affectent les familles et les communautés. Pour lutter contre ce phénomène, il est essentiel de renforcer les protections juridiques, d’améliorer les services de soutien et de promouvoir une éducation qui remet en question les normes nuisibles.",
+    },
+    link: "https://humanrights.ca/story/gender-based-violence-across-canada"
   }
 ];
