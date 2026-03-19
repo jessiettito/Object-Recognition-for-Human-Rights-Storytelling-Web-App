@@ -63,8 +63,8 @@ export const sampleStories = [
   {
     id: "story-4",
     category: {
-      en: "Standard of Living",
-      fr: "Niveau de vie"
+      en: "Economic and social rights",
+      fr: "Droits économiques et sociaux"
     },
     title: {
       en: "Freedom from Want",
@@ -84,8 +84,8 @@ export const sampleStories = [
   {
     id: "story-5",
     category: {
-      en: "Sexual Orientation",
-      fr: "Orientation sexuelle"
+      en: "Identity and discrimination",
+      fr: "Identité et discrimination"
     },
     title: {
       en: "Persecution of Queer Canadian Soldiers in Wartime",
@@ -109,8 +109,8 @@ export const sampleStories = [
       fr: "Les effets de la guerre sur les enfants dans le monde"
     },
     category: {
-      en: "Children",
-      fr: "Enfants"
+      en: "Children and conflict",
+      fr: "Enfants et conflits"
     },
     theme: ["children", "refugee"],
     summary: {
@@ -126,8 +126,8 @@ export const sampleStories = [
   {
     id: "story-7",
     category: {
-      en: "Indigenous",
-      fr: "Autochtones"
+      en: "Identity and culture",
+      fr: "Identité et culture"
     },
     title: {
       en: "What Is Two-Spirit? Part One: Origins",
@@ -147,8 +147,8 @@ export const sampleStories = [
   {
     id: "story-8",
     category: {
-      en: "Discrimination",
-      fr: "Discrimination"
+      en: "Race and justice",
+      fr: "Race et justice"
     },
     title: {
       en: "Black Lives Matter and the Struggle for Racial Justice in Canada",
@@ -168,8 +168,8 @@ export const sampleStories = [
   {
     id: "story-9",
     category: {
-      en: "Refugee",
-      fr: "Personnes réfugiées"
+      en: "Migration and belonging",
+      fr: "Migration et appartenance"
     },
     title: {
       en: "My Future Children Will Never Get to Experience the Home I Knew",
@@ -189,8 +189,8 @@ export const sampleStories = [
   {
     id: "story-10",
     category: {
-      en: "Women",
-      fr: "Femmes"
+      en: "Gender and discrimination",
+      fr: "Genre et discrimination"
     },
     title: {
       en: "Online Misogyny: The Manosphere",
@@ -210,8 +210,8 @@ export const sampleStories = [
   {
     id: "story-11",
     category: {
-      en: "Women",
-      fr: "Femmes"
+      en: "Gender and safety",
+      fr: "Genre et sécurité"
     },
     title: {
       en: "Gender-Based Violence Across Canada",
