@@ -37,7 +37,7 @@
         <div class="modalButtons">
       
           <button class="mainButton startButton" type="button" @click="goToList">
-            {{ screenText.themes }}
+            {{ screenText.list }}
           </button>
         </div>
       </div>
@@ -63,14 +63,14 @@ const textByLanguage = {
     storyLabel: "Story",
     by: "By",
     explore: "Explore Story",
-    themes: "Back to List",
+    list: "Back to List",
   },
   fr: {
     title: "Histoires",
     storyLabel: "Histoire",
     by: "Par",
     explore: "Explorer l'histoire",
-    themes: "Retour à la liste",
+    list: "Retour à la liste",
   },
 };
 

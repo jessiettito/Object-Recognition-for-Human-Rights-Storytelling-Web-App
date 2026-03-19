@@ -37,9 +37,6 @@
           <button class="mainButton startButton" type="button" @click="goBack">
             {{ screenText.back }}
           </button>
-          <button class="mainButton secondaryButton" type="button" @click="goToThemes">
-            {{ screenText.themes }}
-          </button>
         </div>
       </div>
     </section>
@@ -61,8 +58,8 @@ const route = useRoute();
 const router = useRouter();
 
 const textByLanguage = {
-  en: { by: "By", back: "Back", themes: "Back to themes" },
-  fr: { by: "Par", back: "Retour", themes: "Retour aux thèmes" },
+  en: { by: "By", back: "Back" },
+  fr: { by: "Par", back: "Retour" },
 };
 
 const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr : textByLanguage.en));
