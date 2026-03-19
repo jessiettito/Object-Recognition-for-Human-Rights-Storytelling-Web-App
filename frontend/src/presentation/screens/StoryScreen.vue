@@ -6,7 +6,7 @@
 
         <div class="storiesGrid">
           <article
-            v-for="story in sampleStories"
+            v-for="story in stories"
             :key="story.id"
             class="storyCard"
           >
@@ -18,7 +18,7 @@
               </div>
 
               <h2 class="storyTitle">{{ getStoryInfo(story.title) }}</h2>
-              <p class="storyAuthor">{{ screenText.by }} {{ getStoryInfo(story.author) }}</p>
+              
               <p class="storySummary">{{ getStoryInfo(story.summary) }}</p>
 
               <div class="cardActions">
@@ -47,13 +47,14 @@
 
 <script setup>
 import { computed } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { sampleStories } from "../../data/SampleStories";
 
 const props = defineProps({
   language: { type: String, default: "en" },
 });
 
+const route = useRoute();
 const router = useRouter();
 
 const textByLanguage = {
@@ -77,10 +78,22 @@ const screenText = computed(() =>
   props.language === "fr" ? textByLanguage.fr : textByLanguage.en
 );
 
-const stories = computed(() => sampleStories);
+const selectedTheme = computed(() => String(route.query.themeId || "").trim());
 
-function getStoryInfo(storyCategory) {
-  return props.language === "fr" ? storyCategory.fr : storyCategory.en;
+function getStoryThemeIds(story) {
+  return Array.isArray(story.theme) ? story.theme : [];
+}
+
+const stories = computed(() => {
+  if (!selectedTheme.value) return sampleStories;
+  return sampleStories.filter((story) =>
+    getStoryThemeIds(story).includes(selectedTheme.value)
+  );
+});
+
+function getStoryInfo(field) {
+  if (!field) return "";
+  return props.language === "fr" ? field.fr : field.en;
 }
 
 function openStory(storyId) {
