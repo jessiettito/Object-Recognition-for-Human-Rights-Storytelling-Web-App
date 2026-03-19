@@ -266,10 +266,15 @@ onMounted(() => {
 });
 
 function goToStory() {
-  if (autoRedirectTimer) {
-    clearTimeout(autoRedirectTimer);
-  }
-  router.push("/story");
+  if (autoRedirectTimer) 
+  clearTimeout(autoRedirectTimer);
+
+  const themeId = (currentTheme.value?.id || "").trim();
+
+  router.push({
+    path: "/story",
+    query: themeId ? { themeId } : {},
+  });
 }
 
 function goToCapture() {

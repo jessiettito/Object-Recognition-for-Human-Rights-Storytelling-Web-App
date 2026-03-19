@@ -10,12 +10,27 @@
           <span class="pill" v-if="objectLabel">{{ objectLabel }}</span>
         </div>
 
-        <p class="storyAuthor">{{ screenText.by }} {{ author }}</p>
+        <p v-if="author" class="storyAuthor">{{ screenText.by }} {{ author }}</p>
 
         <article class="storyBody" aria-label="Story text">
-          <p v-for="(para, idx) in paragraphs" :key="idx" class="storyParagraph">
-            {{ para }}
-          </p>
+          <template v-if="fullType === 'url' && fullUrl">
+            <a class="externalLink" :href="fullUrl" target="_blank" rel="noopener noreferrer">
+              {{ props.language === "fr" ? "Ouvrir l’histoire" : "Open story" }}
+            </a>
+            <p class="hintText">
+              {{
+                props.language === "fr"
+                  ? "Cette histoire s’ouvre dans un nouvel onglet."
+                  : "This story opens in a new tab."
+              }}
+            </p>
+          </template>
+
+          <template v-else>
+            <p v-for="(para, idx) in paragraphs" :key="idx" class="storyParagraph">
+              {{ para }}
+            </p>
+          </template>
         </article>
 
         <div class="modalButtons">
@@ -71,7 +86,7 @@ const category = computed(() => getStoryInfo(story.value?.category));
 const author = computed(() => getStoryInfo(story.value?.author));
 
 const themeLabel = computed(() => {
-  const id = story.value?.themeIds?.[0];
+  const id = story.value?.theme?.[0];
   return id ? findLabel(themes, id) : "";
 });
 
@@ -80,9 +95,38 @@ const objectLabel = computed(() => {
   return id ? findLabel(objects, id) : "";
 });
 
-const fullText = computed(() => getStoryInfo(story.value?.full));
+const fullRaw = computed(() => story.value?.full || null);
+
+const fullValue = computed(() => {
+  // fullRaw is the object {type,en,fr} or {en,fr} or null
+  return getStoryInfo(fullRaw.value);
+});
+
+const fullType = computed(() => {
+  const t = fullRaw.value?.type;
+  if (typeof t === "string" && t.toLowerCase() === "url") return "url";
+  // Back-compat: if full is just a URL string in en/fr, treat as url
+  const maybe = fullValue.value;
+  return isProbablyUrl(maybe) ? "url" : "text";
+});
+
+const fullUrl = computed(() => {
+  if (fullType.value !== "url") return "";
+  return fullValue.value.trim();
+});
+
+const fullText = computed(() => {
+  if (fullType.value !=="text") return "";
+  const text = fullValue.value;
+  return text || getStoryInfo(story.value?.full);
+});
+
+function isProbablyUrl(s) {
+  return /^https?:\/\/\S+$/i.test((s || "").trim());
+}
+
 const paragraphs = computed(() =>
-  fullText.value
+  (fullText.value || "")
     .split(/\n\s*\n/g)
     .map((p) => p.trim())
     .filter(Boolean)
@@ -93,7 +137,7 @@ function goBack() {
 }
 
 function goToThemes() {
-  router.push("/themes");
+  router.push("/list");
 }
 </script>
 
@@ -145,6 +189,26 @@ function goToThemes() {
 
 .storyParagraph:last-child {
   margin-bottom: 0;
+}
+
+.storyFrame {
+  width: 100%;
+  height: min(70vh, 820px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  background: rgba(0,0,0,0.25);
+}
+
+.externalLink {
+  display: inline-block;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.hintText {
+  margin: 12px 0 0 0;
+  font-size: 13px;
+  opacity: 0.85;
 }
 
 @media (max-width: 768px) {
