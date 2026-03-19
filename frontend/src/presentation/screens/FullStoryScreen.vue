@@ -87,11 +87,6 @@ const title = computed(() => getStoryInfo(story.value?.title) || "Story");
 const category = computed(() => getStoryInfo(story.value?.category));
 const author = computed(() => getStoryInfo(story.value?.author));
 
-// const themeLabel = computed(() => {
-//   const id = story.value?.theme?.[0];
-//   return id ? findLabel(themes, id) : "";
-// });
-
 const themeLabels = computed(() => {
   const ids = story.value?.theme || [];
 
