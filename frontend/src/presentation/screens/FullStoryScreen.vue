@@ -5,8 +5,13 @@
         <h1 id="title" class="screenTitle">{{ title }}</h1>
 
         <div class="storyMetaRow">
-          <span class="pill">{{ category }}</span>
-          <span class="pill" v-if="themeLabel">{{ themeLabel }}</span>
+          <span
+            v-for="(theme, index) in themeLabels"
+            :key="index"
+            class="pill"
+          >
+            {{ theme }}
+          </span>
           <span class="pill" v-if="objectLabel">{{ objectLabel }}</span>
         </div>
 
@@ -37,9 +42,6 @@
           <button class="mainButton startButton" type="button" @click="goBack">
             {{ screenText.back }}
           </button>
-          <button class="mainButton secondaryButton" type="button" @click="goToThemes">
-            {{ screenText.themes }}
-          </button>
         </div>
       </div>
     </section>
@@ -61,8 +63,8 @@ const route = useRoute();
 const router = useRouter();
 
 const textByLanguage = {
-  en: { by: "By", back: "Back", themes: "Back to themes" },
-  fr: { by: "Par", back: "Retour", themes: "Retour aux thèmes" },
+  en: { by: "By", back: "Back" },
+  fr: { by: "Par", back: "Retour" },
 };
 
 const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr : textByLanguage.en));
@@ -85,9 +87,15 @@ const title = computed(() => getStoryInfo(story.value?.title) || "Story");
 const category = computed(() => getStoryInfo(story.value?.category));
 const author = computed(() => getStoryInfo(story.value?.author));
 
-const themeLabel = computed(() => {
-  const id = story.value?.theme?.[0];
-  return id ? findLabel(themes, id) : "";
+const themeLabels = computed(() => {
+  const ids = story.value?.theme || [];
+
+  // remove duplicates
+  const uniqueIds = [...new Set(ids)];
+
+  return uniqueIds
+    .map((id) => findLabel(themes, id))
+    .filter(Boolean);
 });
 
 const objectLabel = computed(() => {

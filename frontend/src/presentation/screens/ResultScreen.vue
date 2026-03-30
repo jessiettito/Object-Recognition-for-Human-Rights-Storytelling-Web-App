@@ -32,9 +32,26 @@
             </button>
           </div>
 
-          <button class="startButton resultButton" type="button" @click="goToNextScreen">
-            Continue
-          </button>
+          <div v-if="isAvailable">
+          <!-- Normal state -->
+            <button class="startButton resultButton" type="button" @click="goToNextScreen">
+              Continue
+            </button>
+          </div>
+
+          <div v-else class="unavailable-state">
+            <p class="message">
+              This item isn’t available yet.
+            </p>
+            <p class="subtext">
+              Try scanning again or explore other stories and themes.
+            </p>
+
+            <div class="actions">
+              <button class="startButton resultButton" type="button" @click="goToList">Browse Objects or Themes</button>
+            </div>
+          </div>
+
 
           <button 
               v-if="!showListOption"
@@ -65,6 +82,7 @@ import { useRouter } from "vue-router";
 import { objects as objectData } from "../../data/Objects.js";
 
 const router = useRouter();
+
 
 /**
  * We pass data using router.push({ state: { ... } }).
@@ -135,6 +153,10 @@ function goToNextScreen() {
   });
 }
 
+function goToList() {
+  router.push("/list");
+}
+
 const selectedObjectId = computed(() => {
   const label = (detectedObjectLabel.value || "").toLowerCase().trim();
 
@@ -146,6 +168,9 @@ const selectedObjectId = computed(() => {
 
   return matchedObject?.id || "";
 });
+
+const object = objectData.find(s=>s.id == selectedObjectId.value)
+const isAvailable = !!object;
 
 </script>
 
