@@ -3,31 +3,8 @@
     <!-- Main camera UI -->
     <section class="mainArea" aria-label="Camera area">
 
-      <!-- Camera preview -->
-      <div class="cameraFrame">
-        <video
-          ref="video"
-          autoplay
-          playsinline
-          class="cameraVideo">
-        </video>
-
-        <div v-if="!cameraStarted" class="cameraHint">
-          {{ screenText.previewHint }}
-        </div>
-
-      </div>
-
-    <!-- Screen buttons -->
-      <div class="bottomControls" aria-label="Camera controls">
-        <button
-          class="mainButton captureButton"
-          type="button"
-          :disabled="isRunningDetection"
-          @click="capturePhoto">
-          {{ isRunningDetection ? "Processing..." : screenText.captureButton }}
-        </button>
-
+      <!-- Screen buttons -->
+      <div class="topControls" aria-label="Camera controls">
         <button class="mainButton secondaryButton" type="button" @click="goToList">
           {{ screenText.chooseObject }}
         </button>
@@ -37,7 +14,7 @@
         </button>
 
         <!-- *** Temporary upload button for testing object detection without using the camera. Will be removed later. *** -->
-        <label class="uploadButton">
+        <label v-if="SHOW_UPLOAD_BUTTON" class="uploadButton mainButton">
           Upload image (test)
           <input
             class="hiddenInput"
@@ -53,6 +30,31 @@
         <div v-if="detectionErrorMessage" class="errorText">
           {{ detectionErrorMessage }}
         </div>
+      </div>
+
+      <!-- Camera preview -->
+      <div class="cameraFrame" :class="{ isProcessing: isRunningDetection }">
+        <video
+          ref="video"
+          autoplay
+          playsinline
+          class="cameraVideo">
+        </video>
+
+        <div v-if="!cameraStarted" class="cameraHint">
+          {{ screenText.previewHint }}
+        </div>
+
+         <!-- Countdown timer -->
+        <div v-else class="countdownOverlay" aria-label="Auto capture countdown">
+          <div v-if="countdown > 0 && !isRunningDetection" class="countdownNumber">
+            {{ countdown }}
+          </div>
+          <div class="countdownSub" :class="{ bold: isRunningDetection }">
+            <span v-if="isRunningDetection">Processing…</span>
+            <span v-else>Hold still</span>
+          </div>
+        </div>        
       </div>
 
       <canvas ref="canvas" style="display:none"></canvas>
@@ -72,15 +74,15 @@ const props = defineProps({
   language: { type: String, default: "en" },
 });
 
+const SHOW_UPLOAD_BUTTON = true; 
 const router = useRouter();
 
 const video = ref(null); 
 const canvas = ref(null);
 
 let stream = null; 
-const cameraStarted = ref(false);
 
-const capturedPhoto = ref(null);
+const cameraStarted = ref(false);
 const hiddenImageForDetection = ref(null);
 const isRunningDetection = ref(false);
 const detectionErrorMessage = ref("");
@@ -88,17 +90,25 @@ const detectionErrorMessage = ref("");
 const CAMERA_REQUESTED_KEY = "cameraPermissionRequested";
 const CAMERA_GRANTED_KEY = "cameraPermissionGranted";
 
+/**
+ * Auto-capture 
+ */
+const COUNTDOWN_SECONDS = 5; 
+const countdown = ref(COUNTDOWN_SECONDS);
+let countdownTimerId = null; 
+
+
 /* Camera */
 async function startCamera() {
 
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: true
-
-    })
+    stream = await navigator.mediaDevices.getUserMedia({ video: true })
     
     if(video.value) {
       video.value.srcObject = stream
+      await video.value.play().catch((err) => {
+        console.error("Error playing video:", err);
+      });
     }
 
     cameraStarted.value = true
@@ -133,22 +143,54 @@ function stopCamera() {
   cameraStarted.value = false;
 }
 
+function startCountdown() {
+  stopCountdown(); 
+  countdown.value = COUNTDOWN_SECONDS; 
+
+  countdownTimerId = window.setInterval (async () => {
+    if(!cameraStarted.value) return; 
+    if(isRunningDetection.value) return; 
+
+    countdown.value -= 1; 
+
+    if(countdown.value <= 0) {
+      stopCountdown(); 
+      countdown.value = 0; 
+      await autoCaptureOnce(); 
+    }
+  }, 1000);
+}
+
+function stopCountdown() {
+  if(countdownTimerId) {
+    window.clearInterval(countdownTimerId);
+    countdownTimerId = null; 
+  }
+}
+
 onMounted(async () => {
   const hasAskedBefore = localStorage.getItem(CAMERA_REQUESTED_KEY) === "true";
   const cameraGrantedBefore = localStorage.getItem(CAMERA_GRANTED_KEY) === "true";
 
   if (!hasAskedBefore) {
-    await startCamera();
+    const ok = await startCamera();
+    if (ok) startCountdown(); 
     return;
   }
 
   if (cameraGrantedBefore) {
-    await startCamera();
+    const ok = await startCamera();
+    if (ok) startCountdown(); 
   }
 });
 
+onUnmounted(() => {
+  stopCountdown();
+  stopCamera();
+});
+
 /* Capture snapshot */
-async function capturePhoto() {
+async function autoCaptureOnce() {
   detectionErrorMessage.value = ""; 
 
   if(!cameraStarted.value) {
@@ -162,13 +204,29 @@ async function capturePhoto() {
 
   if (!video.value || !canvas.value) {
     detectionErrorMessage.value = "Camera is not ready. Please try again.";
+    startCountdown(); // Restart countdown to try again
     return;
   }
 
   try { 
+    countdown.value = 0;
+
     isRunningDetection.value = true;
 
-    const canvasEl = canvas.value
+    const snapshotDataUrl = captureSnapshotDataUrl();
+
+    await runDetectionFromDataUrl(snapshotDataUrl); 
+  } catch (error) {
+    detectionErrorMessage.value = error?.message ?? "Something went wrong during detection."
+    startCountdown(); 
+  } finally {
+    // Stop the camera stream after capturing
+    isRunningDetection.value = false;
+  }
+}
+
+function captureSnapshotDataUrl() {
+  const canvasEl = canvas.value
     const videoEl = video.value
     const ctx = canvasEl.getContext("2d")
 
@@ -187,36 +245,7 @@ async function capturePhoto() {
     )
     ctx.restore()
 
-    capturedPhoto.value = canvasEl.toDataURL("image/png")
-
-    await runDetectionFromDataUrl(capturedPhoto.value); 
-  } catch (error) {
-    detectionErrorMessage.value = error?.message ?? "Something went wrong during detection."
-  } finally {
-    // Stop the camera stream after capturing
-    isRunningDetection.value = false;
-  }
-}
-
-async function retakePhoto() {
-  capturedPhoto.value = null
-
-  try {
-    await restartCamera()
-
-  } catch (err) {
-    console.error(err)
-    alert("Unable to restart camera")
-  }
-}
-
-async function restartCamera() {
-  stream = await navigator.mediaDevices.getUserMedia({
-    video: true
-  })
-
-  video.value.srcObject = stream
-  cameraStarted.value = true
+    return canvasEl.toDataURL("image/png")
 }
 
 /* Navigation */
@@ -227,11 +256,6 @@ function goHome() {
 function goToList() {
   router.push("/list");
 }
-
-/* Cleanup */
-onUnmounted(() => {
-  stopCamera();
-})
 
 // this is to remind myself...
 // Helper function for file upload testing (will be removed later)..
@@ -328,21 +352,29 @@ const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr :
   height: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
+  flex-direction: column;
   gap: clamp(14px, 3vw, 28px);
   padding: clamp(14px, 3.2vw, 28px);
 }
 
 .cameraFrame {
-  width: min(980px, 94vw);
-  height: min(62svh, 520px);
+  position: relative; 
+  overflow: hidden; 
+  width: min(1400px, 98vw);
+  height: 100%;
   border-radius: 22px;
+
   background: rgba(0, 0, 0, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow: 0 22px 70px rgba(0, 0, 0, 0.5);
+  padding: 18px;
+
   display: grid;
   place-items: center;
-  padding: 18px;
+}
+
+.cameraFrame.isProcessing .cameraVideo {
+  filter: blur(12px) brightness(0.9);
 }
 
 .cameraHint {
@@ -351,12 +383,79 @@ const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr :
   text-transform: uppercase;
   opacity: 0.82;
   text-align: center;
+
+  position: absolute;
+  inset: 0; 
+  display: grid;
+  place-items: center;
+  z-index: 3;
 }
 
-.bottomControls {
-  width: min(560px, 92vw);
+.countdownOverlay {
+  position: absolute;
+  inset: 0; 
+  display: grid; 
+  place-items: center;
+  pointer-events: none;
+  text-align: center;
+  z-index: 10; 
+}
+
+.countdownNumber {
+  font-size: clamp(64px, 10vw, 120px);
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.45);
+  padding: 10px 18px; 
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+}
+
+.countdownSub {
+  margin-top: 10px;
+  font-size: 12px;
+  letter-spacing: 0.12em; 
+  text-transform: uppercase;
+  opacity: 0.9; 
+  background: rgba(0, 0, 0, 0.25);
+  padding: 8px 14px;
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  color: #fff;
+}
+
+.topControls {
+  width: min(9200px, 98vw);
   display: grid;
   gap: 12px;
+  margin: 0 auto; 
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  position: sticky; 
+  top: 0;
+  z-index: 10; 
+}
+
+/** We will remove the uploadButton UI once it is removed from the screen. */
+.topControls.twoCols {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+
+.bottomControls .mainButton,
+.bottomControls .uploadButton.mainButton {
+  padding: 12px 14px;
+  font-size: 14px;
+  border-radius: 12px;
+}
+
+/* Upload label should look like buttons */
+.uploadButton.mainButton {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
 }
 
 .captureButton {
@@ -372,6 +471,7 @@ const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr :
   object-fit: cover;
   border-radius: 18px;
   transform: scaleX(-1); /* Flips the camera horizontally */
+  z-index: 1;
 }
 
 .snapshotPreview img {
