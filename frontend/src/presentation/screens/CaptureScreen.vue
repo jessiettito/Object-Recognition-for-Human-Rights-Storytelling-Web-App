@@ -47,7 +47,9 @@
 
          <!-- Countdown timer -->
         <div v-else class="countdownOverlay" aria-label="Auto capture countdown">
-          <div v-if="showCountdown" class="countdownNumber">{{ countdown }}</div>
+          <div v-if="countdown > 0 && !isRunningDetection" class="countdownNumber">
+            {{ countdown }}
+          </div>
           <div class="countdownSub" :class="{ bold: isRunningDetection }">
             <span v-if="isRunningDetection">Processing…</span>
             <span v-else>Hold still</span>
@@ -396,7 +398,7 @@ const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr :
   place-items: center;
   pointer-events: none;
   text-align: center;
-  z-index: 5; 
+  z-index: 10; 
 }
 
 .countdownNumber {
@@ -404,10 +406,10 @@ const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr :
   font-weight: 900;
   color: #ffffff;
   text-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.45);
   padding: 10px 18px; 
   border-radius: 999px;
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(8px);
 }
 
 .countdownSub {
