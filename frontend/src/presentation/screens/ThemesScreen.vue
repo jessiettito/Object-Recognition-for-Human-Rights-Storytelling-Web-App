@@ -266,15 +266,19 @@ onMounted(() => {
 });
 
 function goToStory() {
-  if (autoRedirectTimer) 
-  clearTimeout(autoRedirectTimer);
+  if (autoRedirectTimer)
+    clearTimeout(autoRedirectTimer);
 
   const themeId = (currentTheme.value?.id || "").trim();
 
-  router.push({
-    path: "/story",
-    query: themeId ? { themeId } : {},
-  });
+  const query = {};
+  if (themeId) {
+    query.themeId = themeId;
+  } else if (selectedObjectId.value) {
+    query.objectId = selectedObjectId.value;
+  }
+
+  router.push({ path: "/story", query });
 }
 
 function goToCapture() {

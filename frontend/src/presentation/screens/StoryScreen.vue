@@ -49,6 +49,7 @@
 import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { sampleStories } from "../../data/SampleStories";
+import { objectThemeMap } from "../../data/ObjectThemeMap.js";
 
 const props = defineProps({
   language: { type: String, default: "en" },
@@ -79,16 +80,25 @@ const screenText = computed(() =>
 );
 
 const selectedTheme = computed(() => String(route.query.themeId || "").trim());
+const selectedObjectId = computed(() => String(route.query.objectId || "").trim());
 
 function getStoryThemeIds(story) {
   return Array.isArray(story.theme) ? story.theme : [];
 }
 
 const stories = computed(() => {
-  if (!selectedTheme.value) return sampleStories;
-  return sampleStories.filter((story) =>
-    getStoryThemeIds(story).includes(selectedTheme.value)
-  );
+  if (selectedTheme.value) {
+    return sampleStories.filter((story) =>
+      getStoryThemeIds(story).includes(selectedTheme.value)
+    );
+  }
+  if (selectedObjectId.value) {
+    const themeIds = objectThemeMap[selectedObjectId.value] || [];
+    return sampleStories.filter((story) =>
+      getStoryThemeIds(story).some((id) => themeIds.includes(id))
+    );
+  }
+  return sampleStories;
 });
 
 function getStoryInfo(field) {
@@ -106,6 +116,10 @@ function goToList() {
 </script>
 
 <style scoped>
+.storySummaryScreen {
+  overflow-y: auto;
+}
+
 .screenTitle {
   margin: 0;
   font-size: clamp(34px, 5.2vw, 64px);
