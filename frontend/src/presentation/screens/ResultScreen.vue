@@ -23,6 +23,7 @@
               v-for="(item, idx) in results"
               :key="item.name + idx"
               class="choiceBtn"
+              :class="{ selected: idx === selectedIndex }"
               type="button"
               :aria-pressed="idx === selectedIndex"
               @click="chooseIndex(idx)"
@@ -61,12 +62,13 @@
             Try again
           </button>
 
+          <!-- only show list option after max retries if the object is available -->
           <button
-              v-if="showListOption"
+              v-if="showListOption && isAvailable"
               class="startButton resultButton"
               type="button"
-              @click="goToNextScreen">
-            Choose from list
+              @click="goToList">
+            Choose from list of objects 
           </button>
 
           <div v-if="confidenceText" class="smallMeta">{{ confidenceText }}</div>
@@ -103,7 +105,7 @@ const retryCount = ref(parseInt(localStorage.getItem(RETRY_KEY) || "0"));
 // Selected index (default to 0)
 const selectedIndex = ref(0);
 
-const showListOption = computed(() => retryCount.value >= MAX_RETRIES);
+const showListOption = computed(() => retryCount.value === MAX_RETRIES);
 
 const selected = computed(() => results.value[selectedIndex.value] || null);
 const detectedObjectLabel = computed(() => selected.value?.name || "");
@@ -154,6 +156,7 @@ function goToNextScreen() {
 }
 
 function goToList() {
+  resetRetryCount();
   router.push("/list");
 }
 
@@ -305,9 +308,12 @@ const isAvailable = !!object;
   border-color: rgba(255, 255, 255, 0.22);
 }
 
+.choiceBtn.selected,
 .choiceBtn[aria-pressed="true"] {
-  background: rgba(167, 243, 208, 0.16);
-  border-color: rgba(167, 243, 208, 0.38);
+  background: rgba(2, 153, 83, 0.26);
+  border-color: rgba(167, 243, 208, 0.90);
+  box-shadow: 0 0 0 3px rgba(167, 243, 208, 0.22), 0 18px 36px rgba(0, 0, 0, 0.28);
+  transform: translateY(-1px);
 }
 
 .choiceName {
