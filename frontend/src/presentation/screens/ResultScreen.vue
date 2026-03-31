@@ -23,6 +23,7 @@
               v-for="(item, idx) in results"
               :key="item.name + idx"
               class="choiceBtn"
+              :class="{ selected: idx === selectedIndex }"
               type="button"
               :aria-pressed="idx === selectedIndex"
               @click="chooseIndex(idx)"
@@ -305,9 +306,12 @@ const isAvailable = !!object;
   border-color: rgba(255, 255, 255, 0.22);
 }
 
+.choiceBtn.selected,
 .choiceBtn[aria-pressed="true"] {
-  background: rgba(167, 243, 208, 0.16);
-  border-color: rgba(167, 243, 208, 0.38);
+  background: rgba(2, 153, 83, 0.26);
+  border-color: rgba(167, 243, 208, 0.90);
+  box-shadow: 0 0 0 3px rgba(167, 243, 208, 0.22), 0 18px 36px rgba(0, 0, 0, 0.28);
+  transform: translateY(-1px);
 }
 
 .choiceName {
