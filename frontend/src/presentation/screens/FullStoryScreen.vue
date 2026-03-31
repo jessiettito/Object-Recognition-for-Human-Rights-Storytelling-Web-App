@@ -25,6 +25,12 @@
           <div class="headerRule"></div>
         </header>
 
+        <!-- Reflective prompt -->
+        <div v-if="reflectivePrompt" class="reflectivePrompt">
+          <span class="reflectiveLabel">{{ props.language === "fr" ? "Question de réflexion" : "Reflective Prompt" }}</span>
+          <p class="reflectiveText">{{ reflectivePrompt }}</p>
+        </div>
+
         <!-- Story body -->
         <article class="storyBody" aria-label="Story text">
           <template v-if="fullType === 'url' && fullUrl">
@@ -91,6 +97,7 @@ import { useRoute, useRouter } from "vue-router";
 import { sampleStories } from "../../data/SampleStories";
 import { themes } from "../../data/Themes";
 import { objects } from "../../data/Objects";
+import { promptsByThemes } from "../../data/PromptsByThemes.js";
 
 const props = defineProps({
   language: { type: String, default: "en" },
@@ -138,6 +145,14 @@ const themeLabels = computed(() => {
 const objectLabel = computed(() => {
   const id = story.value?.objectIds?.[0];
   return id ? findLabel(objects, id) : "";
+});
+
+const reflectivePrompt = computed(() => {
+  const themeId = story.value?.theme?.[0];
+  const promptsForTheme = themeId ? promptsByThemes[themeId] : null;
+  const langPrompts = promptsForTheme?.[props.language] || promptsForTheme?.en || [];
+  if (!langPrompts.length) return "";
+  return langPrompts[Math.floor(Math.random() * langPrompts.length)];
 });
 
 const storyLink = computed(() => {
@@ -344,6 +359,36 @@ function goBack() {
   font-family: "Inter", sans-serif;
   font-size: 13px;
   color: #64748b;
+}
+
+/* ── Reflective prompt ── */
+.reflectivePrompt {
+  margin-top: 0;
+  margin-bottom: 28px;
+  padding: 20px 24px;
+  background: rgba(147, 197, 253, 0.07);
+  border-left: 3px solid rgba(147, 197, 253, 0.45);
+  border-radius: 0 14px 14px 0;
+}
+
+.reflectiveLabel {
+  display: block;
+  font-family: "DM Sans", "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #93c5fd;
+  margin-bottom: 10px;
+}
+
+.reflectiveText {
+  margin: 0;
+  font-family: "DM Sans", "Inter", sans-serif;
+  font-size: 17px;
+  line-height: 1.65;
+  font-style: italic;
+  color: #bfdbfe;
 }
 
 /* ── Reference ── */

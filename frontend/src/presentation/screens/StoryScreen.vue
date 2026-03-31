@@ -197,6 +197,7 @@ function goToList() {
   line-height: 1.7;
 }
 
+
 .cardActions {
   display: flex;
   justify-content: flex-end;
