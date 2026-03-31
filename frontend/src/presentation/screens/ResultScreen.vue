@@ -62,12 +62,13 @@
             Try again
           </button>
 
+          <!-- only show list option after max retries if the object is available -->
           <button
-              v-if="showListOption"
+              v-if="showListOption && isAvailable"
               class="startButton resultButton"
               type="button"
-              @click="goToNextScreen">
-            Choose from list
+              @click="goToList">
+            Choose from list of objects 
           </button>
 
           <div v-if="confidenceText" class="smallMeta">{{ confidenceText }}</div>
@@ -104,7 +105,7 @@ const retryCount = ref(parseInt(localStorage.getItem(RETRY_KEY) || "0"));
 // Selected index (default to 0)
 const selectedIndex = ref(0);
 
-const showListOption = computed(() => retryCount.value >= MAX_RETRIES);
+const showListOption = computed(() => retryCount.value === MAX_RETRIES);
 
 const selected = computed(() => results.value[selectedIndex.value] || null);
 const detectedObjectLabel = computed(() => selected.value?.name || "");
@@ -155,6 +156,7 @@ function goToNextScreen() {
 }
 
 function goToList() {
+  resetRetryCount();
   router.push("/list");
 }
 
