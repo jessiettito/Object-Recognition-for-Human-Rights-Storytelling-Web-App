@@ -78,13 +78,14 @@
             v-for="theme in availableThemes"
             :key="theme.id"
             class="popupButton"
+            type="button"
             @click="selectThemeFromPopup(theme.id)"
           >
             {{ getThemeDisplay(theme) }}
           </button>
         </div>
         <button class="popupCancel" @click="goToStory">
-          Continue without selecting
+          {{ screenText.showAllStories }}
         </button>
       </div>
     </div>
@@ -176,7 +177,8 @@ const textByLanguage = {
     popupTitle: "{object} is connected to several themes",
     popupSubtitle: "Which one would you like to explore?",
     reflectivePrompt: "Reflective Prompt",
-    title: "Themes"    
+    title: "Themes",    
+    showAllStories: "Show all stories with this object",
   },
   fr: {
     noThemeSelected: "Aucun thème sélectionné.",
@@ -185,8 +187,9 @@ const textByLanguage = {
     list: "Choisir dans la liste",
     popupTitle: "{object} est lié à plusieurs thèmes",
     popupSubtitle: "Lequel voulez-vous explorer ?",
-     reflectivePrompt: "Question de réflexion",
-    title: "Thèmes"
+    reflectivePrompt: "Question de réflexion",
+    title: "Thèmes", 
+    showAllStories: "Afficher toutes les histoires avec cet objet",
   }
 };
 
@@ -395,23 +398,32 @@ function goToList() {
   padding: 12px;
   font-size: 16px;          
   cursor: pointer;
-  background: #1e293b;     
+  background: #788dae;     
   color: #ffffff;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
   transition: all 0.15s ease;
 }
 
 .popupButton:hover {
-  background: #334155;       
+  background: #334155; 
+  border-color: rgba(96, 165, 250, 0.45);      
   transform: translateY(-1px);
 }
 
 .popupCancel {
-  margin-top: 6px;
+  margin-top: 12px;
   border: none;
-  background: transparent;
+  background: rgba(101, 215, 188, 0.06);
   font-size: 14px;
-  color: #94a3b8;           
+  color: #a0abbb;           
   cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 12px;
+
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .popupCancel:hover {
