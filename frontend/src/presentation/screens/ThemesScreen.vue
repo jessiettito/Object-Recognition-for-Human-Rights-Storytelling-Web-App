@@ -48,16 +48,13 @@
           {{ screenText.noThemeSelected }}
         </p>
 
-        <!-- Single timed button -->
         <div class="modalButtons">
-          <button 
-            class="mainButton startButton" 
-            :class="{ 'filling': timerActive }"
-            type="button" 
+          <button
+            class="mainButton startButton"
+            type="button"
             @click="goToStory"
           >
-            <span class="buttonText">{{ screenText.continue }}</span>
-            <span class="fillBar"></span>
+            {{ screenText.continue }}
           </button>
         </div>
       </div>
@@ -92,7 +89,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { themes } from "../../data/Themes.js";
 import { objects } from "../../data/Objects.js";
@@ -106,8 +103,6 @@ const props = defineProps({
 const router = useRouter();
 const showPopup = ref(false)
 const activeThemeId = ref("")
-const timerActive = ref(false);
-let autoRedirectTimer = null;
 
 // Navigation state values
 const navigationState = computed(() => window.history.state || {});
@@ -143,12 +138,9 @@ onMounted(() => {
   }
 });
 
-// Select theme from object. 
-// Start timer after popup selection
 function selectThemeFromPopup(themeId) {
   activeThemeId.value = themeId;
   showPopup.value = false;
-  startAutoRedirect(); // Start countdown after selection
 }
 
 
@@ -239,36 +231,13 @@ function getObjectIcon(objectId) {
   return obj?.icon || "";
 }
 
-// Start timer when theme is confirmed (popup closed or direct theme selection)
-function startAutoRedirect() {
-  timerActive.value = true;
-  
-  autoRedirectTimer = setTimeout(() => {
-    goToStory();
-  }, 10000); // 10 seconds
-}
-// Clean up on unmount
-onUnmounted(() => {
-  if (autoRedirectTimer) {
-    clearTimeout(autoRedirectTimer);
-  }
-});
 onMounted(() => {
-  // If coming with a theme directly (no popup needed), start timer
-  if (selectedType.value === "theme" && selectedThemeId.value) {
-    startAutoRedirect();
-  }
-  
-  // If object selected, show popup first
   if (selectedType.value === "object" && availableThemes.value.length > 0) {
     showPopup.value = true;
   }
 });
 
 function goToStory() {
-  if (autoRedirectTimer)
-    clearTimeout(autoRedirectTimer);
-
   const themeId = (currentTheme.value?.id || "").trim();
 
   const query = {};
@@ -446,51 +415,7 @@ function goToList() {
 }
 
 .startButton {
-  position: relative;
-  overflow: hidden;
-  background: rgba(59, 130, 246, 0.2); /* subtle blue base */
+  background: rgba(59, 130, 246, 0.2);
   border: 2px solid rgba(59, 130, 246, 0.5);
-  z-index: 1;
-}
-
-.startButton .buttonText {
-  position: relative;
-  z-index: 2; 
-}
-
-.startButton .fillBar {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 0;
-  background: linear-gradient(90deg, #a7f3d0, #60a5fa);
-  z-index: 1;
-  transition: none;
-}
-
-.startButton.filling .fillBar {
-  animation: fillProgress 10s linear forwards;
-}
-@keyframes fillProgress {
-  from {
-    width: 0%;
-  }
-  to {
-    width: 100%;
-  }
-}
-
-.startButton.filling {
-  animation: subtlePulse 10s ease-in-out;
-}
-
-@keyframes subtlePulse {
-  0%, 70% {
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-  }
-  85%, 100% {
-    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.5);
-  }
 }
 </style>
