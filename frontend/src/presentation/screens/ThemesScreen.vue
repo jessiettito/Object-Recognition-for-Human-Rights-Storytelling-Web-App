@@ -414,8 +414,4 @@ function goToList() {
   flex-direction: column;
 }
 
-.startButton {
-  background: rgba(59, 130, 246, 0.2);
-  border: 2px solid rgba(59, 130, 246, 0.5);
-}
 </style>

@@ -61,6 +61,19 @@
           </template>
         </article>
 
+        <!-- Reference link -->
+        <footer v-if="storyLink" class="storyReference">
+          <span class="referenceLabel">{{ props.language === "fr" ? "Source" : "Reference" }}</span>
+          <a
+            class="referenceLink"
+            :href="storyLink"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ props.language === "fr" ? "Lire l'histoire complète →" : "Read the full story →" }}
+          </a>
+        </footer>
+
         <div class="modalButtons">
           <button class="mainButton backButton" type="button" @click="goBack">
             ← {{ screenText.back }}
@@ -125,6 +138,12 @@ const themeLabels = computed(() => {
 const objectLabel = computed(() => {
   const id = story.value?.objectIds?.[0];
   return id ? findLabel(objects, id) : "";
+});
+
+const storyLink = computed(() => {
+  const link = story.value?.link;
+  if (!link) return "";
+  return props.language === "fr" ? (link.fr || link.en || "") : (link.en || link.fr || "");
 });
 
 const fullRaw = computed(() => story.value?.full || null);
@@ -325,6 +344,40 @@ function goBack() {
   font-family: "Inter", sans-serif;
   font-size: 13px;
   color: #64748b;
+}
+
+/* ── Reference ── */
+.storyReference {
+  margin-top: 32px;
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.referenceLabel {
+  font-family: "DM Sans", "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.referenceLink {
+  font-family: "DM Sans", "Inter", sans-serif;
+  font-size: 14px;
+  color: #93c5fd;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  word-break: break-all;
+}
+
+.referenceLink:hover {
+  color: #bfdbfe;
 }
 
 /* ── Back button ── */
