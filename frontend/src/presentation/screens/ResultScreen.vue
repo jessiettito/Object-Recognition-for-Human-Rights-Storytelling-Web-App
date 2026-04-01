@@ -16,7 +16,7 @@
 
         <!-- Object name in the center -->
         <div class="resultText">
-          <h1 id="objectName" class="objectName">{{ objectNameText }}</h1>
+          <h1 v-if="results.length" id="objectName" class="objectName">{{ objectNameText }}</h1>
 
           <!-- Nothing detected -->
           <template v-if="!results.length">
@@ -57,13 +57,12 @@
 
             <!-- Not in library -->
             <div v-else class="unavailable-state">
-              <p class="message">This item isn't available yet.</p>
               <p class="subtext">Try scanning again or explore other stories and themes.</p>
               <button class="startButton resultButton" type="button" @click="goToList">Browse Objects or Themes</button>
             </div>
 
             <button
-                v-if="!showListOption"
+                v-if="!showListOption || !isAvailable"
                 class="secondaryButton resultButton"
                 type="button"
                 @click="goBackToCapture">

@@ -4,8 +4,6 @@
 
     <section class="contentArea" aria-labelledby="title">
       <div class="modalCard">
-        <h1 id="title" class="title">{{ screenText.title }}</h1>
-
         <!-- Show selected object/theme information -->
         <!-- THEME ONLY -->
         <div v-if="!selectedObjectId && currentTheme" class="selection columnLayout">
@@ -244,7 +242,7 @@ function startAutoRedirect() {
   
   autoRedirectTimer = setTimeout(() => {
     goToStory();
-  }, 5000); // 5 seconds
+  }, 3000); // 3 seconds
 }
 // Clean up on unmount
 onUnmounted(() => {
@@ -493,7 +491,7 @@ function goToList() {
 }
 
 .startButton.filling .fillBar {
-  animation: fillProgress 5s linear forwards;
+  animation: fillProgress 3s linear forwards;
 }
 @keyframes fillProgress {
   from {
