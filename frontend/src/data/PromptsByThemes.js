@@ -249,12 +249,12 @@ export const promptsByThemes = {
   freedom_expression: {
     en: [
       "How does having (or not having) a voice affect participation in society?",
-      "When have you felt most free—or least free—to express yourself?",
+      "When have you felt most free or least free to express yourself?",
       "Why is freedom of expression important for democracy and human rights?"
     ],
     fr: [
       "Comment le fait d’avoir (ou de ne pas avoir) une voix influence-t-il la participation à la société ?",
-      "À quel moment vous êtes-vous senti(e) le plus libre — ou le moins libre — de vous exprimer ?",
+      "À quel moment vous êtes-vous senti(e) le plus libre - ou le moins libre - de vous exprimer ?",
       "Pourquoi la liberté d’expression est-elle importante pour la démocratie et les droits humains ?"
     ]
   },
