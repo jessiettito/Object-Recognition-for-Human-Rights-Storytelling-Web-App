@@ -24,5 +24,15 @@ export const objects = [
   { id: "bicycle", en: "Bicycle", fr: "Vélo", icon: "bicycle.svg" },
   { id: "food_plate", en: "Plate of food", fr: "Assiette de nourriture", icon: "food_plate.svg" },
   { id: "school_bag", en: "School bag", fr: "Sac d’école", icon: "school_bag.svg" },
-  { id: "headphones", en: "Headphones", fr: "Casque audio", icon: "headphones.svg" }
+  { id: "headphones", en: "Headphones", fr: "Casque audio", icon: "headphones.svg" },
+  { id: "chair", en: "chair", fr: "chaise", icon: "chair.svg" },
+  { id: "couch", en: "couch", fr: "canapé", icon: "couch.svg" },
+  { id: "bed", en: "bed", fr: "lit", icon: "bed.svg" },
+  { id: "umbrella", en: "umbrella", fr: "parapluie", icon: "umbrella.svg" },
+  { id: "tie", en: "tie", fr: "cravate", icon: "tie.svg" },
+  { id: "clock", en: "clock", fr: "horloge", icon: "clock.svg" },
+  { id: "fork", en: "fork", fr: "fourchette", icon: "fork.svg" },
+  { id: "spoon", en: "spoon", fr: "cuillère", icon: "spoon.svg" },
+  { id: "bowl", en: "bowl", fr: "bol", icon: "bowl.svg" },
+  { id: "scissors", en: "scissors", fr: "ciseaux", icon: "scissors.svg" },
 ];
