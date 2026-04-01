@@ -81,7 +81,13 @@
             type="button"
             @click="selectThemeFromPopup(theme.id)"
           >
-            {{ getThemeDisplay(theme) }}
+            <img
+              v-if="theme.icon"
+              :src="`/icons/${theme.icon}`"
+              :alt="getThemeDisplay(theme)"
+              class="popupThemeIcon"
+            />
+            <span>{{ getThemeDisplay(theme) }}</span>
           </button>
         </div>
         <button class="popupCancel" @click="goToStory">
@@ -393,15 +399,26 @@ function goToList() {
 }
 
 .popupButton {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   border: none;
   border-radius: 12px;
-  padding: 12px;
-  font-size: 16px;          
+  padding: 12px 16px;
+  font-size: 16px;
   cursor: pointer;
-  background: #788dae;     
+  background: #788dae;
   color: #ffffff;
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
   transition: all 0.15s ease;
+  text-align: left;
+}
+
+.popupThemeIcon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .popupButton:hover {
