@@ -24,7 +24,17 @@ export const objectThemeMap = {
   bicycle: ["health", "labour", "standard_of_living"],
   food_plate: ["health", "standard_of_living", "children"],
   school_bag: ["education", "children", "discrimination"],
-  headphones: ["culture_identity", "education", "political"]
+  headphones: ["mental_health", "freedom_expression", "disability"],
+  chair: ["housing_homelessness", "disability", "standard_of_living"],
+  couch: ["housing_homelessness", "standard_of_living", "health"],
+  bed: ["housing_homelessness", "health", "standard_of_living"],
+  umbrella: ["refugee", "housing_homelessness", "standard_of_living"],
+  tie: ["labour", "discrimination", "culture_identity"],
+  clock: ["labour", "access_justice", "health"],
+  fork: ["health", "standard_of_living", "children"],
+  spoon: ["health", "children", "standard_of_living"],
+  bowl: ["health", "children", "standard_of_living"],
+  scissors: ["education", "labour", "freedom_expression"],
 };
 
 export function getThemeIdsForObject(objectId) {
