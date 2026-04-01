@@ -17,4 +17,9 @@ export const themes = [
   { id: "health", en: "Health", fr: "Santé", icon: "health.svg" },
   { id: "shelter", en: "Shelter", fr: "Logement", icon: "shelter.svg" },
   { id: "standard_of_living", en: "Standard of Living", fr: "Niveau de vie", icon: "standard_of_living.svg" },
+  { id: "privacy_surveillance", en: "Privacy & Surveillance", fr: "Vie privée et surveillance", icon: "privacy.svg" },
+  { id: "freedom_expression", en: "Freedom of Expression", fr: "Liberté d’expression", icon: "expression.svg" },
+  { id: "access_justice", en: "Access to Justice", fr: "Accès à la justice", icon: "justice.svg" },
+  { id: "mental_health", en: "Mental Health", fr: "Santé mentale", icon: "mental_health.svg" },
+  { id: "housing_homelessness", en: "Housing & Homelessness", fr: "Logement et itinérance", icon: "housing.svg" },
 ];
