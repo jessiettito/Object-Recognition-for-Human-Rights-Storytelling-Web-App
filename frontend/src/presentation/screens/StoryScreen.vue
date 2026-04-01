@@ -6,7 +6,7 @@
 
         <div class="storiesGrid">
           <article
-            v-for="story in sampleStories"
+            v-for="story in stories"
             :key="story.id"
             class="storyCard"
           >
@@ -18,7 +18,7 @@
               </div>
 
               <h2 class="storyTitle">{{ getStoryInfo(story.title) }}</h2>
-              <p class="storyAuthor">{{ screenText.by }} {{ getStoryInfo(story.author) }}</p>
+              
               <p class="storySummary">{{ getStoryInfo(story.summary) }}</p>
 
               <div class="cardActions">
@@ -37,7 +37,7 @@
         <div class="modalButtons">
       
           <button class="mainButton startButton" type="button" @click="goToList">
-            {{ screenText.themes }}
+            {{ screenText.list }}
           </button>
         </div>
       </div>
@@ -47,13 +47,15 @@
 
 <script setup>
 import { computed } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { sampleStories } from "../../data/SampleStories";
+import { objectThemeMap } from "../../data/ObjectThemeMap.js";
 
 const props = defineProps({
   language: { type: String, default: "en" },
 });
 
+const route = useRoute();
 const router = useRouter();
 
 const textByLanguage = {
@@ -62,14 +64,14 @@ const textByLanguage = {
     storyLabel: "Story",
     by: "By",
     explore: "Explore Story",
-    themes: "Back to List",
+    list: "Back to List",
   },
   fr: {
     title: "Histoires",
     storyLabel: "Histoire",
     by: "Par",
     explore: "Explorer l'histoire",
-    themes: "Retour à la liste",
+    list: "Retour à la liste",
   },
 };
 
@@ -77,10 +79,31 @@ const screenText = computed(() =>
   props.language === "fr" ? textByLanguage.fr : textByLanguage.en
 );
 
-const stories = computed(() => sampleStories);
+const selectedTheme = computed(() => String(route.query.themeId || "").trim());
+const selectedObjectId = computed(() => String(route.query.objectId || "").trim());
 
-function getStoryInfo(storyCategory) {
-  return props.language === "fr" ? storyCategory.fr : storyCategory.en;
+function getStoryThemeIds(story) {
+  return Array.isArray(story.theme) ? story.theme : [];
+}
+
+const stories = computed(() => {
+  if (selectedTheme.value) {
+    return sampleStories.filter((story) =>
+      getStoryThemeIds(story).includes(selectedTheme.value)
+    );
+  }
+  if (selectedObjectId.value) {
+    const themeIds = objectThemeMap[selectedObjectId.value] || [];
+    return sampleStories.filter((story) =>
+      getStoryThemeIds(story).some((id) => themeIds.includes(id))
+    );
+  }
+  return sampleStories;
+});
+
+function getStoryInfo(field) {
+  if (!field) return "";
+  return props.language === "fr" ? field.fr : field.en;
 }
 
 function openStory(storyId) {
@@ -93,6 +116,10 @@ function goToList() {
 </script>
 
 <style scoped>
+.storySummaryScreen {
+  overflow-y: auto;
+}
+
 .screenTitle {
   margin: 0;
   font-size: clamp(34px, 5.2vw, 64px);
