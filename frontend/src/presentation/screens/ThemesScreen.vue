@@ -15,7 +15,15 @@
             class="themeIcon"
           />
 
-          <span class="pill">{{ selectionText }}</span>
+          <button
+            class="pill startButton"
+            :class="{ filling: timerActive }"
+            type="button"
+            @click="goToStory"
+          >
+            <span class="buttonText">{{ selectionText }}</span>
+            <span class="fillBar"></span>
+          </button>
         </div>
 
         <!-- OBJECT + THEME -->
@@ -26,39 +34,21 @@
             class="objectIcon"
           />
 
-          <span class="pill">{{ selectionText }}</span>
+          <button
+            class="pill startButton"
+            :class="{ filling: timerActive }"
+            type="button"
+            @click="goToStory"
+          >
+            <span class="buttonText">{{ selectionText }}</span>
+            <span class="fillBar"></span>
+          </button>
 
           <img
             :src="`/icons/${currentTheme.icon}`"
             :alt="currentTheme.name"
             class="themeIcon"
           />
-        </div>
- 
-        <!-- Display theme and reflective prompt -->
-        <div v-if="currentTheme" class="themeContent">
-          <div class="promptSection">
-            <h3 class="promptLabel">{{ screenText.reflectivePrompt }}</h3>
-            <p class="prompt">{{ getReflectivePrompt(currentTheme.id) }}</p>
-          </div>
-        </div>
-
-        <!-- Fallback when no theme is selected -->
-        <p v-else class="body">
-          {{ screenText.noThemeSelected }}
-        </p>
-
-        <!-- Single timed button -->
-        <div class="modalButtons">
-          <button 
-            class="mainButton startButton" 
-            :class="{ 'filling': timerActive }"
-            type="button" 
-            @click="goToStory"
-          >
-            <span class="buttonText">{{ screenText.continue }}</span>
-            <span class="fillBar"></span>
-          </button>
         </div>
       </div>
     </section>
@@ -254,7 +244,7 @@ function startAutoRedirect() {
   
   autoRedirectTimer = setTimeout(() => {
     goToStory();
-  }, 10000); // 10 seconds
+  }, 5000); // 5 seconds
 }
 // Clean up on unmount
 onUnmounted(() => {
@@ -316,14 +306,18 @@ function goToList() {
 
 .selection .pill {
   font-family: "Inter", sans-serif;
-  font-size: 20px;         
-  font-weight: 700;        
+  font-size: 20px;
+  font-weight: 700;
   padding: 12px 22px;
   border-radius: 22px;
-  background: rgba(147, 197, 253, 0.25); 
+  background: rgba(147, 197, 253, 0.25);
+  border: none;
   color: #fdf6f0;
   box-shadow: 0 4px 14px rgba(0,0,0,0.35);
   text-transform: capitalize;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
   transition: transform 0.15s ease, background 0.15s ease;
 }
 
@@ -499,7 +493,7 @@ function goToList() {
 }
 
 .startButton.filling .fillBar {
-  animation: fillProgress 10s linear forwards;
+  animation: fillProgress 5s linear forwards;
 }
 @keyframes fillProgress {
   from {
