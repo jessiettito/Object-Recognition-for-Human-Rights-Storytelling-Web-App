@@ -297,6 +297,71 @@ export const promptsByThemes = {
       "Pourquoi le logement est-il souvent considéré comme un droit humain lié à la dignité ?"
     ]
   },
+
+  poverty: {
+    en: [
+      "How can a lack of basic everyday objects affect a person’s daily life and choices?",
+      "What is one object you rely on that not everyone may have access to?",
+      "Why can not having enough resources make it harder to feel safe, healthy, or included?"
+    ],
+    fr: [
+      "Comment le manque d’objets essentiels du quotidien peut-il affecter la vie et les choix d’une personne ?",
+      "Quel est un objet sur lequel vous comptez, mais auquel tout le monde n’a pas forcément accès ?",
+      "Pourquoi le manque de ressources peut-il rendre plus difficile le fait de se sentir en sécurité, en santé ou inclus ?"
+    ]
+  },
+
+  war_conflict: {
+    en: [
+      "How can conflict change the meaning of everyday objects like clothing, photos, or documents?",
+      "What object would you take with you if you had to leave quickly for safety?",
+      "Why can ordinary objects become especially important during times of uncertainty or danger?"
+    ],
+    fr: [
+      "Comment les conflits peuvent-ils changer la signification d’objets du quotidien comme les vêtements, les photos ou les documents ?",
+      "Quel objet emporteriez-vous si vous deviez partir rapidement pour votre sécurité ?",
+      "Pourquoi des objets ordinaires peuvent-ils devenir particulièrement importants en période d’incertitude ou de danger ?"
+    ]
+  },
+
+  violence_abuse: {
+    en: [
+      "How can everyday spaces or objects affect a person’s sense of safety?",
+      "What helps you feel safe and supported in your daily environment?",
+      "Why is feeling safe an important part of dignity and well-being?"
+    ],
+    fr: [
+      "Comment les espaces ou objets du quotidien peuvent-ils influencer le sentiment de sécurité d’une personne ?",
+      "Qu’est-ce qui vous aide à vous sentir en sécurité et soutenu(e) dans votre environnement quotidien ?",
+      "Pourquoi le sentiment de sécurité est-il important pour la dignité et le bien-être ?"
+    ]
+  },
+
+  environment: {
+    en: [
+      "How do everyday objects connect to the environment and natural resources?",
+      "What object in your daily life depends on clean air, water, or land?",
+      "Why is caring for the environment important for people’s health and future?"
+    ],
+    fr: [
+      "Comment les objets du quotidien sont-ils liés à l’environnement et aux ressources naturelles ?",
+      "Quel objet de votre vie quotidienne dépend de l’air, de l’eau ou de la terre propres ?",
+      "Pourquoi prendre soin de l’environnement est-il important pour la santé et l’avenir des personnes ?"
+    ]
+  },
+
+  climate_change: {
+    en: [
+      "How can climate change affect access to everyday necessities like food, water, or shelter?",
+      "What changes have you noticed in your environment over time?",
+      "Why might climate change affect some communities more than others?"
+    ],
+    fr: [
+      "Comment les changements climatiques peuvent-ils affecter l’accès aux besoins essentiels comme la nourriture, l’eau ou le logement ?",
+      "Quels changements avez-vous remarqués dans votre environnement au fil du temps ?",
+      "Pourquoi les changements climatiques peuvent-ils affecter certaines communautés plus que d’autres ?"
+    ]
+  }
 };
 
 export function getPromptsForTheme(themeId) {

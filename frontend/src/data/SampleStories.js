@@ -262,5 +262,180 @@ export const sampleStories = [
       en: "https://humanrights.ca/story/gender-based-violence-across-canada",
       fr: "https://droitsdelapersonne.ca/histoire/violence-fondee-sur-le-genre-au-canada"
     }
+  },
+  
+  {
+    id: "story-12",
+    category: {
+      en: "Protection of human rights",
+      fr: "Protection des droits de la personne"
+    },
+    title: {
+      en: "Pass the Mic: Let’s Talk About Racism",
+      fr: "Passer le micro : parlons du racisme"
+    },
+    theme: ["discrimination", "political", "freedom_expression"],
+    summary: {
+      en: "Personal stories highlight how racism shapes everyday experiences and why speaking up matters.",
+      fr: "Des récits personnels montrent comment le racisme influence le quotidien et pourquoi il est important de prendre la parole."
+    },
+    full: {
+      en: "This story brings together voices reflecting on lived experiences of racism in Canada. It highlights how discrimination appears in everyday interactions, institutions, and opportunities. By sharing these stories, individuals challenge silence and encourage dialogue, emphasizing the importance of listening, learning, and acting collectively to address systemic inequality.",
+      fr: "Ce récit rassemble des témoignages sur les expériences vécues du racisme au Canada. Il montre comment la discrimination se manifeste dans la vie quotidienne, les institutions et les possibilités. En partageant ces histoires, les individus brisent le silence et encouragent le dialogue, soulignant l’importance d’écouter, d’apprendre et d’agir collectivement."
+    },
+    link: {
+      en: "https://humanrights.ca/story/pass-mic-lets-talk-about-racism",
+      fr: "https://droitsdelapersonne.ca/histoire/passez-le-micro-parlons-de-racisme?_gl=1*1u8fvkt*_gcl_au*MTM4ODAzMDY0Ni4xNzczODAxNzkx*_ga*MTU4ODc2MDkzMS4xNzczODAxNzky*_ga_H5CQX3NE8X*czE3NzUxNDYzODkkbzUkZzEkdDE3NzUxNDY2MTMkajU2JGwwJGgw"
+    }
+  },
+
+  {
+    id: "story-13",
+    category: {
+      en: "Collective rights",
+      fr: "Droits collectifs"
+    },
+    title: {
+      en: "The Doctrine of Discovery",
+      fr: "La doctrine de la découverte"
+    },
+    theme: ["indigenous", "discrimination", "political"],
+    summary: {
+      en: "A colonial doctrine shaped land rights and continues to affect Indigenous communities today.",
+      fr: "Une doctrine coloniale a façonné les droits territoriaux et continue d’affecter les peuples autochtones aujourd’hui."
+    },
+    full: {
+      en: "The Doctrine of Discovery was used to justify European claims to Indigenous lands. Its legacy continues to influence legal systems and land disputes. Understanding this history is key to addressing ongoing injustices and supporting Indigenous rights and sovereignty.",
+      fr: "La doctrine de la découverte a servi à justifier les revendications européennes sur les terres autochtones. Son héritage influence encore aujourd’hui les systèmes juridiques et les conflits territoriaux. Comprendre cette histoire est essentiel pour soutenir les droits autochtones."
+    },
+    link: {
+      en: "https://humanrights.ca/story/doctrine-discovery",
+      fr: "https://droitsdelapersonne.ca/histoire/la-doctrine-de-la-decouverte?_gl=1*1cxhyxq*_gcl_au*MTM4ODAzMDY0Ni4xNzczODAxNzkx*_ga*MTU4ODc2MDkzMS4xNzczODAxNzky*_ga_H5CQX3NE8X*czE3NzUxNDYzODkkbzUkZzEkdDE3NzUxNDY2NDIkajI3JGwwJGgw"
+    }
+  },
+
+  {
+    id: "story-14",
+    category: {
+      en: "Civil and political rights",
+      fr: "Droits civils et politiques"
+    },
+    title: {
+      en: "Manitoba’s Mincome experiment",
+      fr: "L’expérience Mincome au Manitoba"
+    },
+    theme: ["poverty", "standard_of_living", "health"],
+    summary: {
+      en: "A guaranteed income experiment showed impacts on poverty and well-being.",
+      fr: "Une expérience de revenu garanti a montré ses effets sur la pauvreté et le bien-être."
+    },
+    full: {
+      en: "The Mincome experiment explored how a guaranteed income could reduce poverty. Results suggested improvements in health and stability, raising questions about long-term social policy solutions.",
+      fr: "L’expérience Mincome a étudié l’impact d’un revenu garanti sur la pauvreté, révélant des améliorations en santé et en stabilité."
+    },
+    link: {
+      en: "https://humanrights.ca/story/manitobas-mincome-experiment",
+      fr: "https://droitsdelapersonne.ca/histoire/lexperience-mincome-au-manitoba?_gl=1*lzdep4*_gcl_au*MTM4ODAzMDY0Ni4xNzczODAxNzkx*_ga*MTU4ODc2MDkzMS4xNzczODAxNzky*_ga_H5CQX3NE8X*czE3NzUxNDYzODkkbzUkZzEkdDE3NzUxNDY2ODgkajUxJGwwJGgw"
+    }
+  },
+
+  {
+    id: "story-15",
+    category: {
+      en: "Human rights violations",
+      fr: "Violations des droits de la personne"
+    },
+    title: {
+      en: "Remembering the Srebrenica Genocide",
+      fr: "Se souvenir du génocide de Srebrenica"
+    },
+    theme: ["war_conflict", "violence_abuse"],
+    summary: {
+      en: "Personal stories reflect on genocide and remembrance.",
+      fr: "Des témoignages reflètent le génocide et la mémoire."
+    },
+    full: {
+      en: "Survivors and communities continue to reflect on the legacy of the Srebrenica genocide, emphasizing remembrance and education to prevent future atrocities.",
+      fr: "Les survivants et les communautés se souviennent du génocide de Srebrenica pour prévenir de futures atrocités."
+    },
+    link: {
+      en: "https://humanrights.ca/story/remembering-srebrenica-genocide",
+      fr: "https://droitsdelapersonne.ca/histoire/souvenirs-du-genocide-de-srebrenica?_gl=1*rhoh9r*_gcl_au*MTM4ODAzMDY0Ni4xNzczODAxNzkx*_ga*MTU4ODc2MDkzMS4xNzczODAxNzky*_ga_H5CQX3NE8X*czE3NzUxNDYzODkkbzUkZzEkdDE3NzUxNDY3NDgkajUxJGwwJGgw"
+    }
+  },
+
+  {
+    id: "story-16",
+    category: {
+      en: "Collective rights",
+      fr: "Droits collectifs"
+    },
+    title: {
+      en: "The Wilcox County integrated prom",
+      fr: "Le bal de finissants intégré du comté de Wilcox"
+    },
+    theme: ["discrimination", "children", "education"],
+    summary: {
+      en: "Students challenged segregation traditions.",
+      fr: "Des élèves ont défié la ségrégation."
+    },
+    full: {
+      en: "Students organized their first integrated prom, challenging long-standing racial divisions and promoting equality.",
+      fr: "Des élèves ont organisé un bal intégré, remettant en question la ségrégation raciale."
+    },
+    link: {
+      en: "https://humanrights.ca/story/wilcox-county-integrated-prom",
+      fr: "https://droitsdelapersonne.ca/histoire/un-bal-des-finissants-mixte-wilcox-county?_gl=1*1gs8zik*_gcl_au*MTM4ODAzMDY0Ni4xNzczODAxNzkx*_ga*MTU4ODc2MDkzMS4xNzczODAxNzky*_ga_H5CQX3NE8X*czE3NzUxNDYzODkkbzUkZzEkdDE3NzUxNDY3ODMkajE2JGwwJGgw"
+    }
+  },
+
+  {
+    id: "story-17",
+    category: {
+      en: "Sexual diversity rights",
+      fr: "Droits liés à la diversité sexuelle"
+    },
+    title: {
+      en: "Claiming our rights as a transgender family",
+      fr: "Revendiquer nos droits en tant que famille transgenre"
+    },
+    theme: ["gender_identity", "sexual_orientation", "family"],
+    summary: {
+      en: "A family advocates for recognition and acceptance.",
+      fr: "Une famille revendique reconnaissance et acceptation."
+    },
+    full: {
+      en: "This story explores how one family navigates identity, love, and legal recognition while advocating for transgender rights.",
+      fr: "Ce récit explore comment une famille navigue l’identité et milite pour les droits des personnes transgenres."
+    },
+    link: {
+      en: "https://humanrights.ca/story/claiming-our-rights-transgender-family",
+      fr: "https://droitsdelapersonne.ca/histoire/revendiquer-nos-droits-en-tant-que-famille-transgenre?_gl=1*1l3jynd*_gcl_au*MTM4ODAzMDY0Ni4xNzczODAxNzkx*_ga*MTU4ODc2MDkzMS4xNzczODAxNzky*_ga_H5CQX3NE8X*czE3NzUxNDYzODkkbzUkZzEkdDE3NzUxNDY4MDUkajYwJGwwJGgw"
+    }
+  },
+
+  {
+    id: "story-18",
+    category: {
+      en: "Human rights promotion",
+      fr: "Promotion des droits de la personne"
+    },
+    title: {
+      en: "Bringing the potlatch home",
+      fr: "Ramener le potlatch à la maison"
+    },
+    theme: ["indigenous", "culture_identity"],
+    summary: {
+      en: "Cultural practices are reclaimed after suppression.",
+      fr: "Des pratiques culturelles sont réappropriées après leur interdiction."
+    },
+    full: {
+      en: "The potlatch ceremony was banned for decades. Its return represents cultural resilience and the restoration of identity.",
+      fr: "Le potlatch a été interdit pendant des décennies, et son retour symbolise la résilience culturelle."
+    },
+    link: {
+      en: "https://humanrights.ca/story/bringing-potlatch-home",
+      fr: "https://droitsdelapersonne.ca/histoire/ramener-la-tradition-du-potlatch-la-maison?_gl=1*s0fjrg*_gcl_au*MTM4ODAzMDY0Ni4xNzczODAxNzkx*_ga*MTU4ODc2MDkzMS4xNzczODAxNzky*_ga_H5CQX3NE8X*czE3NzUxNDYzODkkbzUkZzEkdDE3NzUxNDY4NjIkajMkbDAkaDA."
+    }
   }
 ];
