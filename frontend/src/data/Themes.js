@@ -22,4 +22,9 @@ export const themes = [
   { id: "access_justice", en: "Access to Justice", fr: "Accès à la justice", icon: "justice.svg" },
   { id: "mental_health", en: "Mental Health", fr: "Santé mentale", icon: "mental_health.svg" },
   { id: "housing_homelessness", en: "Housing & Homelessness", fr: "Logement et itinérance", icon: "housing.svg" },
+  { id: "poverty", en: "Poverty", fr: "Pauvreté", icon: "poverty.svg" },
+  { id: "war_conflict", en: "War & Conflict", fr: "Guerre et conflits", icon: "war.svg" },
+  { id: "violence_abuse", en: "Violence & Abuse", fr: "Violence et abus", icon: "violence.svg" },
+  { id: "environment", en: "Environment", fr: "Environnement", icon: "environment.svg" },
+  { id: "climate_change", en: "Climate Change", fr: "Changements climatiques", icon: "climate.svg" }
 ];
