@@ -61,7 +61,6 @@
 <script setup>
 import { computed } from "vue";
 import { useRouter } from 'vue-router'
-import { objects } from '../../data/Objects.js'
 const router = useRouter();
 
 const props = defineProps({
@@ -79,7 +78,6 @@ const textByLanguage = {
       { label: "Scan",     desc: "The app identifies it instantly" },
       { label: "Discover", desc: "Explore the human rights story behind it" },
     ],
-    pillsLabel: "Try scanning:",
     startButtonText: "Start scanning!",
     chooseButtonText: "Choose an object instead",
     footerNote: "Prototype experience",
@@ -92,17 +90,11 @@ const textByLanguage = {
       { label: "Scannez",   desc: "L'application l'identifie instantanément" },
       { label: "Découvrez", desc: "Explorez l'histoire des droits humains" },
     ],
-    pillsLabel: "Essayez de scanner :",
     startButtonText: "Commencer le scan!",
     chooseButtonText: "Choisir plutôt un objet",
     footerNote: "Expérience prototype",
   },
 };
-
-const PREVIEW_IDS = ['passport_id', 'suitcase', 'letter', 'photograph', 'book', 'backpack', 'cell phone']
-const exampleObjects = computed(() =>
-  PREVIEW_IDS.map(id => objects.find(o => o.id === id)).filter(Boolean)
-)
 
 const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr : textByLanguage.en));
 
@@ -215,33 +207,4 @@ function skipScan() {
   line-height: 1.4;
 }
 
-/* ── Object pills ── */
-.pillsRow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin: clamp(12px, 2vw, 18px) auto 0 auto;
-  width: min(620px, 92vw);
-}
-
-.pillsLabel {
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.55;
-  margin-right: 2px;
-}
-
-.objectPill {
-  display: inline-block;
-  padding: 5px 11px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  font-size: 12px;
-  letter-spacing: 0.03em;
-  opacity: 0.85;
-}
 </style>
