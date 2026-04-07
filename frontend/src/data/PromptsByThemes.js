@@ -231,6 +231,136 @@ export const promptsByThemes = {
       "Quel objet ordinaire de votre vie serait le plus difficile à perdre ?",
       "Pourquoi l’accès à des objets de base peut-il en dire long sur l’inégalité et la dignité ?"
     ]
+  },
+
+    privacy_surveillance: {
+    en: [
+      "How do everyday technologies affect privacy and personal freedom?",
+      "When do you feel most observed or tracked in daily life?",
+      "Why can privacy be considered a human right in a digital world?"
+    ],
+    fr: [
+      "Comment les technologies du quotidien affectent-elles la vie privée et la liberté personnelle ?",
+      "À quel moment vous sentez-vous le plus observé(e) ou suivi(e) dans la vie quotidienne ?",
+      "Pourquoi la vie privée peut-elle être considérée comme un droit humain dans un monde numérique ?"
+    ]
+  },
+
+  freedom_expression: {
+    en: [
+      "How does having (or not having) a voice affect participation in society?",
+      "When have you felt most free or least free to express yourself?",
+      "Why is freedom of expression important for democracy and human rights?"
+    ],
+    fr: [
+      "Comment le fait d’avoir (ou de ne pas avoir) une voix influence-t-il la participation à la société ?",
+      "À quel moment vous êtes-vous senti(e) le plus libre - ou le moins libre - de vous exprimer ?",
+      "Pourquoi la liberté d’expression est-elle importante pour la démocratie et les droits humains ?"
+    ]
+  },
+
+  access_justice: {
+    en: [
+      "What barriers can prevent people from getting fair treatment or support?",
+      "What would it feel like to need help but not be believed or listened to?",
+      "Why does access to justice matter for safety, equality, and dignity?"
+    ],
+    fr: [
+      "Quels obstacles peuvent empêcher les gens d’obtenir un traitement équitable ou du soutien ?",
+      "Comment vous sentiriez-vous si vous aviez besoin d’aide mais que l’on ne vous croyait pas ou ne vous écoutait pas ?",
+      "Pourquoi l’accès à la justice est-il important pour la sécurité, l’égalité et la dignité ?"
+    ]
+  },
+
+  mental_health: {
+    en: [
+      "How can stress, trauma, or uncertainty affect mental well-being?",
+      "What helps you feel calm, supported, or safe when life is difficult?",
+      "Why should mental health care be treated as part of the right to health?"
+    ],
+    fr: [
+      "Comment le stress, le traumatisme ou l’incertitude peuvent-ils affecter le bien-être mental ?",
+      "Qu’est-ce qui vous aide à vous sentir calme, soutenu(e) ou en sécurité lorsque la vie est difficile ?",
+      "Pourquoi les soins en santé mentale devraient-ils faire partie du droit à la santé ?"
+    ]
+  },
+
+  housing_homelessness: {
+    en: [
+      "How does stable housing affect access to school, work, and health?",
+      "What makes a place feel safe and like “home” to you?",
+      "Why is housing often considered a human right connected to dignity?"
+    ],
+    fr: [
+      "Comment un logement stable influence-t-il l’accès à l’école, au travail et à la santé ?",
+      "Qu’est-ce qui fait qu’un endroit semble sûr et ressemble à un « chez-soi » pour vous ?",
+      "Pourquoi le logement est-il souvent considéré comme un droit humain lié à la dignité ?"
+    ]
+  },
+
+  poverty: {
+    en: [
+      "How can a lack of basic everyday objects affect a person’s daily life and choices?",
+      "What is one object you rely on that not everyone may have access to?",
+      "Why can not having enough resources make it harder to feel safe, healthy, or included?"
+    ],
+    fr: [
+      "Comment le manque d’objets essentiels du quotidien peut-il affecter la vie et les choix d’une personne ?",
+      "Quel est un objet sur lequel vous comptez, mais auquel tout le monde n’a pas forcément accès ?",
+      "Pourquoi le manque de ressources peut-il rendre plus difficile le fait de se sentir en sécurité, en santé ou inclus ?"
+    ]
+  },
+
+  war_conflict: {
+    en: [
+      "How can conflict change the meaning of everyday objects like clothing, photos, or documents?",
+      "What object would you take with you if you had to leave quickly for safety?",
+      "Why can ordinary objects become especially important during times of uncertainty or danger?"
+    ],
+    fr: [
+      "Comment les conflits peuvent-ils changer la signification d’objets du quotidien comme les vêtements, les photos ou les documents ?",
+      "Quel objet emporteriez-vous si vous deviez partir rapidement pour votre sécurité ?",
+      "Pourquoi des objets ordinaires peuvent-ils devenir particulièrement importants en période d’incertitude ou de danger ?"
+    ]
+  },
+
+  violence_abuse: {
+    en: [
+      "How can everyday spaces or objects affect a person’s sense of safety?",
+      "What helps you feel safe and supported in your daily environment?",
+      "Why is feeling safe an important part of dignity and well-being?"
+    ],
+    fr: [
+      "Comment les espaces ou objets du quotidien peuvent-ils influencer le sentiment de sécurité d’une personne ?",
+      "Qu’est-ce qui vous aide à vous sentir en sécurité et soutenu(e) dans votre environnement quotidien ?",
+      "Pourquoi le sentiment de sécurité est-il important pour la dignité et le bien-être ?"
+    ]
+  },
+
+  environment: {
+    en: [
+      "How do everyday objects connect to the environment and natural resources?",
+      "What object in your daily life depends on clean air, water, or land?",
+      "Why is caring for the environment important for people’s health and future?"
+    ],
+    fr: [
+      "Comment les objets du quotidien sont-ils liés à l’environnement et aux ressources naturelles ?",
+      "Quel objet de votre vie quotidienne dépend de l’air, de l’eau ou de la terre propres ?",
+      "Pourquoi prendre soin de l’environnement est-il important pour la santé et l’avenir des personnes ?"
+    ]
+  },
+
+  climate_change: {
+    en: [
+      "How can climate change affect access to everyday necessities like food, water, or shelter?",
+      "What changes have you noticed in your environment over time?",
+      "Why might climate change affect some communities more than others?"
+    ],
+    fr: [
+      "Comment les changements climatiques peuvent-ils affecter l’accès aux besoins essentiels comme la nourriture, l’eau ou le logement ?",
+      "Quels changements avez-vous remarqués dans votre environnement au fil du temps ?",
+      "Pourquoi les changements climatiques peuvent-ils affecter certaines communautés plus que d’autres ?"
+    ]
   }
 };
 

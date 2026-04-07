@@ -16,41 +16,68 @@
 
         <!-- Object name in the center -->
         <div class="resultText">
-          <h1 id="objectName" class="objectName">{{ objectNameText }}</h1>
+          <h1 v-if="results.length" id="objectName" class="objectName">{{ objectNameText }}</h1>
 
-          <div v-if="results.length" class="choices" role="list" aria-label="Top detected objects">
-            <button
-              v-for="(item, idx) in results"
-              :key="item.name + idx"
-              class="choiceBtn"
-              type="button"
-              :aria-pressed="idx === selectedIndex"
-              @click="chooseIndex(idx)"
-            >
-              <span class="choiceName">{{ item.name }}</span>
-              <span class="choiceScore">{{ Math.round(item.confidence * 100) }}%</span>
+          <!-- Nothing detected -->
+          <template v-if="!results.length">
+            <p class="libraryStatus libraryStatus--missing">✗ No object detected</p>
+            <p class="subtext">Make sure the object is well-lit and clearly visible.</p>
+            <button class="secondaryButton resultButton" type="button" @click="goBackToCapture">
+              Try again
             </button>
-          </div>
+          </template>
 
-          <button class="startButton resultButton" type="button" @click="goToNextScreen">
-            Continue
-          </button>
+          <!-- Object detected -->
+          <template v-else>
+            <p class="libraryStatus" :class="isAvailable ? 'libraryStatus--found' : 'libraryStatus--missing'">
+              {{ isAvailable ? '✓ Object found in library' : '✗ Object not available in library' }}
+            </p>
 
-          <button 
-              v-if="!showListOption"
-              class="secondaryButton resultButton" 
-              type="button" 
-              @click="goBackToCapture">
-            Try again
-          </button>
+            <div v-if="isAvailable" class="choices" role="list" aria-label="Top detected objects">
+              <button
+                v-for="(item, idx) in results"
+                :key="item.name + idx"
+                class="choiceBtn"
+                :class="{ selected: idx === selectedIndex, 'choiceBtn--unavailable': !isObjectAvailable(item.name) }"
+                type="button"
+                :aria-pressed="idx === selectedIndex"
+                @click="chooseIndex(idx)"
+              >
+                <span class="choiceName">{{ item.name }}</span>
+                <span class="choiceScore">{{ Math.round(item.confidence * 100) }}%</span>
+              </button>
+            </div>
 
-          <button
-              v-if="showListOption"
-              class="startButton resultButton"
-              type="button"
-              @click="goToNextScreen">
-            Choose from list
-          </button>
+            <!-- Available: Continue -->
+            <div v-if="isAvailable">
+              <button class="startButton resultButton" type="button" @click="goToNextScreen">
+                Continue
+              </button>
+            </div>
+
+            <!-- Not in library -->
+            <div v-else class="unavailable-state">
+              <p class="subtext">Try scanning again or explore other stories and themes.</p>
+              <button class="startButton resultButton" type="button" @click="goToList">Browse Objects or Themes</button>
+            </div>
+
+            <button
+                v-if="!showListOption || !isAvailable"
+                class="secondaryButton resultButton"
+                type="button"
+                @click="goBackToCapture">
+              Try again
+            </button>
+
+            <!-- only show list option after max retries if the object is available -->
+            <button
+                v-if="showListOption && isAvailable"
+                class="startButton resultButton"
+                type="button"
+                @click="goToList">
+              Choose from list of objects
+            </button>
+          </template>
 
           <div v-if="confidenceText" class="smallMeta">{{ confidenceText }}</div>
         </div>
@@ -65,6 +92,7 @@ import { useRouter } from "vue-router";
 import { objects as objectData } from "../../data/Objects.js";
 
 const router = useRouter();
+
 
 /**
  * We pass data using router.push({ state: { ... } }).
@@ -85,7 +113,7 @@ const retryCount = ref(parseInt(localStorage.getItem(RETRY_KEY) || "0"));
 // Selected index (default to 0)
 const selectedIndex = ref(0);
 
-const showListOption = computed(() => retryCount.value >= MAX_RETRIES);
+const showListOption = computed(() => retryCount.value === MAX_RETRIES);
 
 const selected = computed(() => results.value[selectedIndex.value] || null);
 const detectedObjectLabel = computed(() => selected.value?.name || "");
@@ -135,17 +163,27 @@ function goToNextScreen() {
   });
 }
 
-const selectedObjectId = computed(() => {
-  const label = (detectedObjectLabel.value || "").toLowerCase().trim();
+function goToList() {
+  resetRetryCount();
+  router.push("/list");
+}
 
-  const matchedObject = objectData.find(
+function findObjectByLabel(label) {
+  const normalized = (label || "").toLowerCase().trim();
+  return objectData.find(
     (item) =>
-      item.id.toLowerCase() === label ||
-      item.en.toLowerCase() === label
+      item.id.toLowerCase() === normalized ||
+      item.en.toLowerCase() === normalized
   );
+}
 
-  return matchedObject?.id || "";
-});
+function isObjectAvailable(label) {
+  return !!findObjectByLabel(label);
+}
+
+const selectedObjectId = computed(() => findObjectByLabel(detectedObjectLabel.value)?.id || "");
+
+const isAvailable = computed(() => !!findObjectByLabel(detectedObjectLabel.value));
 
 </script>
 
@@ -280,9 +318,12 @@ const selectedObjectId = computed(() => {
   border-color: rgba(255, 255, 255, 0.22);
 }
 
+.choiceBtn.selected,
 .choiceBtn[aria-pressed="true"] {
-  background: rgba(167, 243, 208, 0.16);
-  border-color: rgba(167, 243, 208, 0.38);
+  background: rgba(2, 153, 83, 0.26);
+  border-color: rgba(167, 243, 208, 0.90);
+  box-shadow: 0 0 0 3px rgba(167, 243, 208, 0.22), 0 18px 36px rgba(0, 0, 0, 0.28);
+  transform: translateY(-1px);
 }
 
 .choiceName {
@@ -296,6 +337,33 @@ const selectedObjectId = computed(() => {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   opacity: 0.85;
+}
+
+.choiceBtn--unavailable {
+  opacity: 0.7;
+}
+
+.subtext {
+  margin: 6px auto 0;
+  font-size: 13px;
+  opacity: 0.7;
+  max-width: 38ch;
+}
+
+.libraryStatus {
+  margin: 12px auto 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.libraryStatus--found {
+  color: #a7f3d0;
+}
+
+.libraryStatus--missing {
+  color: #fca5a5;
 }
 
 .noResults {
