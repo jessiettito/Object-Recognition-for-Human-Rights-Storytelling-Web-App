@@ -5,25 +5,13 @@
 
       <!-- Screen buttons -->
       <div class="topControls" aria-label="Camera controls">
-        <button class="mainButton secondaryButton" type="button" @click="goToList">
-          {{ screenText.chooseObject }}
-        </button>
-
         <button class="mainButton pillButton" type="button" @click="goHome">
           {{ screenText.home }}
         </button>
 
-        <!-- *** Temporary upload button for testing object detection without using the camera. Will be removed later. *** -->
-        <label v-if="SHOW_UPLOAD_BUTTON" class="uploadButton mainButton">
-          Upload image (test)
-          <input
-            class="hiddenInput"
-            type="file"
-            accept="image/*"
-            @change="onImageUpload"
-            :disabled="isRunningDetection"
-          />
-        </label>
+        <button class="mainButton pillBUtton" type="button" @click="goToList">
+          {{ screenText.chooseObject }}
+        </button>
 
         <img ref="hiddenImageForDetection" class="hiddenPreview" alt="" />
 
@@ -74,7 +62,6 @@ const props = defineProps({
   language: { type: String, default: "en" },
 });
 
-const SHOW_UPLOAD_BUTTON = true; 
 const router = useRouter();
 
 const video = ref(null); 
@@ -257,17 +244,6 @@ function goToList() {
   router.push("/list");
 }
 
-// this is to remind myself...
-// Helper function for file upload testing (will be removed later)..
-function readFileAsDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const fileReader = new FileReader();
-    fileReader.onerror = () => reject(new Error("Could not read the image file."));
-    fileReader.onload = () => resolve(fileReader.result);
-    fileReader.readAsDataURL(file);
-  });
-}
-
 /**
  * Waits for the image element to load the given data URL, or rejects if it fails to load.
  * @param imageElement 
@@ -306,37 +282,16 @@ async function runDetectionFromDataUrl(imageDataUrl) {
   });
 }
 
-// this is to remind myself...
-// This is just a test function to allow uploading an image file instead of using the camera. *** will be removd after meeting or testing. 
-async function onImageUpload(event) {
-  detectionErrorMessage.value = "";
-  const selectedFile = event.target.files?.[0];
-  if (!selectedFile) return;
-
-  try {
-    isRunningDetection.value = true;
-    const imageDataUrl = await readFileAsDataUrl(selectedFile);
-    await runDetectionFromDataUrl(imageDataUrl);
-  } catch (error) {
-    detectionErrorMessage.value = error?.message ?? "Something went wrong during detection.";
-  } finally {
-    isRunningDetection.value = false;
-    event.target.value = "";
-  }
-}
-
 /* Computed properties for text and styles */
 const textByLanguage = {
   en: {
     chooseObject: "Choose from list",
     previewHint: "Camera preview will appear here",
-    captureButton: "Capture",
     home: "Home",
   },
   fr: {
     chooseObject: "Choisir un objet",
     previewHint: "Aperçu de la caméra ici",
-    captureButton: "Capturer",
     home: "Accueil",
   },
 };
@@ -426,41 +381,22 @@ const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr :
 }
 
 .topControls {
-  width: min(9200px, 98vw);
+  width: min(920px, 98vw);
   display: grid;
   gap: 12px;
   margin: 0 auto; 
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: stretch;
   position: sticky; 
   top: 0;
   z-index: 10; 
 }
 
-/** We will remove the uploadButton UI once it is removed from the screen. */
-.topControls.twoCols {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-
-.bottomControls .mainButton,
-.bottomControls .uploadButton.mainButton {
-  padding: 12px 14px;
-  font-size: 14px;
-  border-radius: 12px;
-}
-
-/* Upload label should look like buttons */
-.uploadButton.mainButton {
+.mainButton {
   display: inline-flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-}
-
-.captureButton {
-  color: rgba(0, 0, 0, 0.92);
-  background: linear-gradient(90deg, #fde68a, #93c5fd);
 }
 
 .cameraVideo {
