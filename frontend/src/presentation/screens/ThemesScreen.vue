@@ -43,7 +43,6 @@ import { useRouter } from "vue-router";
 import { themes } from "../../data/Themes.js";
 import { objects } from "../../data/Objects.js";
 import { objectThemeMap } from "../../data/ObjectThemeMap.js";
-import { promptsByThemes } from "../../data/PromptsByThemes.js";
 
 const props = defineProps({
   language: { type: String, default: "en" },
@@ -119,7 +118,6 @@ const textByLanguage = {
     list: "Choose from list",
     popupTitle: "{object} is connected to several themes",
     popupSubtitle: "Which one would you like to explore?",
-    reflectivePrompt: "Reflective Prompt",
     title: "Themes",    
     showAllStories: "Show all stories with this object",
   },
@@ -130,7 +128,6 @@ const textByLanguage = {
     list: "Choisir dans la liste",
     popupTitle: "{object} est lié à plusieurs thèmes",
     popupSubtitle: "Lequel voulez-vous explorer ?",
-    reflectivePrompt: "Question de réflexion",
     title: "Thèmes", 
     showAllStories: "Afficher toutes les histoires avec cet objet",
   }
@@ -141,27 +138,6 @@ const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr :
 // Helper functions
 function getThemeDisplay(theme) {
   return props.language === "fr" ? theme.fr : theme.en;
-}
-
-
-function getReflectivePrompt(themeId) {
-  const promptsForTheme = promptsByThemes[themeId];
-  if (!promptsForTheme) {
-    return props.language === "fr"
-      ? "Parlez-nous de votre lien avec ce thème."
-      : "Tell us about your connection to this theme.";
-  }
-
-  const languagePrompts = promptsForTheme[props.language] || promptsForTheme.en || [];
-
-  if (!languagePrompts.length) {
-    return props.language === "fr"
-      ? "Parlez-nous de votre lien avec ce thème."
-      : "Tell us about your connection to this theme.";
-  }
-
-  const randomIndex = Math.floor(Math.random() * languagePrompts.length);
-  return languagePrompts[randomIndex];
 }
 
 const objectsList = computed(() =>
