@@ -2,56 +2,7 @@
 <template>
   <main class="screen themesScreen" role="main" aria-label="Themes screen">
 
-    <section class="contentArea" aria-labelledby="title">
-      <div class="modalCard">
-        <!-- Show selected object/theme information -->
-        <!-- THEME ONLY -->
-        <div v-if="!selectedObjectId && currentTheme" class="selection columnLayout">
-          <img
-            :src="`/icons/${currentTheme.icon}`"
-            :alt="currentTheme.name"
-            class="themeIcon"
-          />
-
-          <button
-            class="pill startButton"
-            :class="{ filling: timerActive }"
-            type="button"
-            @click="goToStory"
-          >
-            <span class="buttonText">{{ selectionText }}</span>
-            <span class="fillBar"></span>
-          </button>
-        </div>
-
-        <!-- OBJECT + THEME -->
-        <div v-else-if="selectedObjectId && currentTheme" class="selection">
-          <img
-            :src="`/icons/${getObjectIcon(selectedObjectId)}`"
-            :alt="selectedName"
-            class="objectIcon"
-          />
-
-          <button
-            class="pill startButton"
-            :class="{ filling: timerActive }"
-            type="button"
-            @click="goToStory"
-          >
-            <span class="buttonText">{{ selectionText }}</span>
-            <span class="fillBar"></span>
-          </button>
-
-          <img
-            :src="`/icons/${currentTheme.icon}`"
-            :alt="currentTheme.name"
-            class="themeIcon"
-          />
-        </div>
-      </div>
-    </section>
-
-      <!-- Pop up screen -->
+    <!-- Pop up screen -->
     <div v-if="showPopup" class="popupOverlay">
       <div class="modalCard popupCard">
         <h2 class="popupTitle">
@@ -87,12 +38,10 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { themes } from "../../data/Themes.js";
-import { objects } from "../../data/Objects.js";
 import { objectThemeMap } from "../../data/ObjectThemeMap.js";
-import { promptsByThemes } from "../../data/PromptsByThemes.js";
 
 const props = defineProps({
   language: { type: String, default: "en" },
@@ -101,8 +50,6 @@ const props = defineProps({
 const router = useRouter();
 const showPopup = ref(false)
 const activeThemeId = ref("")
-const timerActive = ref(false);
-let autoRedirectTimer = null;
 
 // Navigation state values
 const navigationState = computed(() => window.history.state || {});
@@ -126,63 +73,23 @@ const availableThemes = computed(() => {
   return themes.filter(theme => themeIds.includes(theme.id))
 })
 
-onMounted(() => {
-  console.log("Navigation state:", navigationState.value);
-  console.log("selectedType:", selectedType.value);
-  console.log("selectedObjectId:", selectedObjectId.value);
-  console.log("availableThemes:", availableThemes.value);
-
-  if (selectedType.value === "object" && availableThemes.value.length > 0) {
-    showPopup.value = true;
-    console.log("Popup shown!");
-  }
-});
-
 // Select theme from object. 
 // Start timer after popup selection
 function selectThemeFromPopup(themeId) {
   activeThemeId.value = themeId;
   showPopup.value = false;
-  startAutoRedirect(); // Start countdown after selection
+  goToStory();
 }
-
-
-// Display text for the selected item
-const selectionText = computed(() => {
-  if (selectedType.value === "theme" && selectedName.value) {
-    const prefix = props.language === "fr" ? "Thème" : "Theme";
-    return `${prefix}: ${selectedName.value}`;
-  }
-  
-  if (selectedType.value === "object" && selectedName.value) {
-    const prefix = props.language === "fr" ? "Objet" : "Object";
-    const themeName = currentTheme.value ? getThemeDisplay(currentTheme.value) : "";
-    return `${selectedName.value} → ${themeName}`;
-  }
-  return "";
-});
 
 const textByLanguage = {
   en: {
-    noThemeSelected: "No theme selected. Please choose a theme.",
-    continue: "Continue",
-    tryAgain: "Try again",
-    list: "Choose from list",
     popupTitle: "{object} is connected to several themes",
     popupSubtitle: "Which one would you like to explore?",
-    reflectivePrompt: "Reflective Prompt",
-    title: "Themes",    
     showAllStories: "Show all stories with this object",
   },
   fr: {
-    noThemeSelected: "Aucun thème sélectionné.",
-    continue: "Continuer",
-    tryAgain: "Réessayer",
-    list: "Choisir dans la liste",
     popupTitle: "{object} est lié à plusieurs thèmes",
     popupSubtitle: "Lequel voulez-vous explorer ?",
-    reflectivePrompt: "Question de réflexion",
-    title: "Thèmes", 
     showAllStories: "Afficher toutes les histoires avec cet objet",
   }
 };
@@ -194,66 +101,11 @@ function getThemeDisplay(theme) {
   return props.language === "fr" ? theme.fr : theme.en;
 }
 
-
-function getReflectivePrompt(themeId) {
-  const promptsForTheme = promptsByThemes[themeId];
-  if (!promptsForTheme) {
-    return props.language === "fr"
-      ? "Parlez-nous de votre lien avec ce thème."
-      : "Tell us about your connection to this theme.";
-  }
-
-  const languagePrompts = promptsForTheme[props.language] || promptsForTheme.en || [];
-
-  if (!languagePrompts.length) {
-    return props.language === "fr"
-      ? "Parlez-nous de votre lien avec ce thème."
-      : "Tell us about your connection to this theme.";
-  }
-
-  const randomIndex = Math.floor(Math.random() * languagePrompts.length);
-  return languagePrompts[randomIndex];
-}
-
-const objectsList = computed(() =>
-  objects.map(o => ({
-    id: o.id,
-    name: props.language === "fr" ? o.fr : o.en,
-    icon: o.icon,
-  }))
-);
-
-const themesList = computed(() =>
-  themes.map(t => ({
-    id: t.id,
-    name: props.language === "fr" ? t.fr : t.en,
-    icon: t.icon,
-  }))
-);
-
-function getObjectIcon(objectId) {
-  const obj = objectsList.value.find(o => o.id === objectId);
-  return obj?.icon || "";
-}
-
-// Start timer when theme is confirmed (popup closed or direct theme selection)
-function startAutoRedirect() {
-  timerActive.value = true;
-  
-  autoRedirectTimer = setTimeout(() => {
-    goToStory();
-  }, 3000); // 3 seconds
-}
-// Clean up on unmount
-onUnmounted(() => {
-  if (autoRedirectTimer) {
-    clearTimeout(autoRedirectTimer);
-  }
-});
 onMounted(() => {
   // If coming with a theme directly (no popup needed), start timer
   if (selectedType.value === "theme" && selectedThemeId.value) {
-    startAutoRedirect();
+    goToStory();
+    return;
   }
   
   // If object selected, show popup first
@@ -263,9 +115,7 @@ onMounted(() => {
 });
 
 function goToStory() {
-  if (autoRedirectTimer)
-    clearTimeout(autoRedirectTimer);
-
+ 
   const themeId = (currentTheme.value?.id || "").trim();
 
   const query = {};
@@ -278,76 +128,9 @@ function goToStory() {
   router.push({ path: "/story", query });
 }
 
-function goToCapture() {
-  router.push("/capture");
-}
-
-function goToList() {
-  router.push("/list");
-}
 </script>
 
 <style scoped>
-
-.title {
-  margin: 0;
-  font-size: clamp(34px, 5.2vw, 64px);
-  line-height: 1.04;
-}
-
-.body {
-  margin: 14px auto 0 auto;
-  max-width: 60ch;
-  font-size: 14px;
-  opacity: 0.92;
-}
-
-.selection .pill {
-  font-family: "Inter", sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  padding: 12px 22px;
-  border-radius: 22px;
-  background: rgba(147, 197, 253, 0.25);
-  border: none;
-  color: #fdf6f0;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.35);
-  text-transform: capitalize;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.15s ease, background 0.15s ease;
-}
-
-.selection .pill:hover {
-  transform: translateY(-2px);
-  background: rgba(147, 197, 253, 0.4);
-}
-
-.contentArea {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-
-.promptSection {
-  font-family: "Inter", "Roboto", sans-serif;
-  font-size: 18px;         
-  line-height: 1.6;        
-  font-weight: 500;
-  color: #fdf6f0;         
-  background: rgba(23, 33, 61, 0.35); 
-  padding: 16px 20px;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3); 
-  margin-top: 16px;
-  text-align: left;
-}
-
-.objectName {
-  font-style: italic;
-}
 
 .popupOverlay {
   position: fixed;
@@ -437,81 +220,5 @@ function goToList() {
 
 .popupCancel:hover {
   opacity: 0.7;
-}
-
-.selection {
-  display: flex;
-  align-items: center;      
-  justify-content: center;  
-  gap: 24px;                
-  margin: 16px 0;
-}
-
-.selection .objectIcon,
-.selection .themeIcon {
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
-  transition: transform 0.2s ease, filter 0.2s ease;
-
-}
-
-.selection .objectIcon:hover,
-.selection .themeIcon:hover {
-  transform: scale(1.1);            
-  filter: brightness(1.2);      
-}
-
-.selection.columnLayout {
-  flex-direction: column;
-}
-
-.startButton {
-  position: relative;
-  overflow: hidden;
-  background: rgba(59, 130, 246, 0.2); /* subtle blue base */
-  border: 2px solid rgba(59, 130, 246, 0.5);
-  z-index: 1;
-}
-
-.startButton .buttonText {
-  position: relative;
-  z-index: 2; 
-}
-
-.startButton .fillBar {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 0;
-  background: linear-gradient(90deg, #a7f3d0, #60a5fa);
-  z-index: 1;
-  transition: none;
-}
-
-.startButton.filling .fillBar {
-  animation: fillProgress 3s linear forwards;
-}
-@keyframes fillProgress {
-  from {
-    width: 0%;
-  }
-  to {
-    width: 100%;
-  }
-}
-
-.startButton.filling {
-  animation: subtlePulse 10s ease-in-out;
-}
-
-@keyframes subtlePulse {
-  0%, 70% {
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-  }
-  85%, 100% {
-    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.5);
-  }
 }
 </style>
