@@ -2,56 +2,7 @@
 <template>
   <main class="screen themesScreen" role="main" aria-label="Themes screen">
 
-    <section class="contentArea" aria-labelledby="title">
-      <div class="modalCard">
-        <!-- Show selected object/theme information -->
-        <!-- THEME ONLY -->
-        <div v-if="!selectedObjectId && currentTheme" class="selection columnLayout">
-          <img
-            :src="`/icons/${currentTheme.icon}`"
-            :alt="currentTheme.name"
-            class="themeIcon"
-          />
-
-          <button
-            class="pill startButton"
-            :class="{ filling: timerActive }"
-            type="button"
-            @click="goToStory"
-          >
-            <span class="buttonText">{{ selectionText }}</span>
-            <span class="fillBar"></span>
-          </button>
-        </div>
-
-        <!-- OBJECT + THEME -->
-        <div v-else-if="selectedObjectId && currentTheme" class="selection">
-          <img
-            :src="`/icons/${getObjectIcon(selectedObjectId)}`"
-            :alt="selectedName"
-            class="objectIcon"
-          />
-
-          <button
-            class="pill startButton"
-            :class="{ filling: timerActive }"
-            type="button"
-            @click="goToStory"
-          >
-            <span class="buttonText">{{ selectionText }}</span>
-            <span class="fillBar"></span>
-          </button>
-
-          <img
-            :src="`/icons/${currentTheme.icon}`"
-            :alt="currentTheme.name"
-            class="themeIcon"
-          />
-        </div>
-      </div>
-    </section>
-
-      <!-- Pop up screen -->
+    <!-- Pop up screen -->
     <div v-if="showPopup" class="popupOverlay">
       <div class="modalCard popupCard">
         <h2 class="popupTitle">
@@ -87,7 +38,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { themes } from "../../data/Themes.js";
 import { objects } from "../../data/Objects.js";
@@ -101,8 +52,6 @@ const props = defineProps({
 const router = useRouter();
 const showPopup = ref(false)
 const activeThemeId = ref("")
-const timerActive = ref(false);
-let autoRedirectTimer = null;
 
 // Navigation state values
 const navigationState = computed(() => window.history.state || {});
@@ -143,7 +92,7 @@ onMounted(() => {
 function selectThemeFromPopup(themeId) {
   activeThemeId.value = themeId;
   showPopup.value = false;
-  startAutoRedirect(); // Start countdown after selection
+  goToStory();
 }
 
 
@@ -236,24 +185,11 @@ function getObjectIcon(objectId) {
   return obj?.icon || "";
 }
 
-// Start timer when theme is confirmed (popup closed or direct theme selection)
-function startAutoRedirect() {
-  timerActive.value = true;
-  
-  autoRedirectTimer = setTimeout(() => {
-    goToStory();
-  }, 3000); // 3 seconds
-}
-// Clean up on unmount
-onUnmounted(() => {
-  if (autoRedirectTimer) {
-    clearTimeout(autoRedirectTimer);
-  }
-});
+
 onMounted(() => {
   // If coming with a theme directly (no popup needed), start timer
   if (selectedType.value === "theme" && selectedThemeId.value) {
-    startAutoRedirect();
+    goToStory();
   }
   
   // If object selected, show popup first
@@ -263,9 +199,7 @@ onMounted(() => {
 });
 
 function goToStory() {
-  if (autoRedirectTimer)
-    clearTimeout(autoRedirectTimer);
-
+ 
   const themeId = (currentTheme.value?.id || "").trim();
 
   const query = {};
