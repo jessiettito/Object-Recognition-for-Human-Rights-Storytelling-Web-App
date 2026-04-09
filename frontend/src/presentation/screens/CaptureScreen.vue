@@ -42,6 +42,15 @@
             <span v-if="isRunningDetection">Processing…</span>
             <span v-else>Hold still</span>
           </div>
+          <button
+            v-if="!isRunningDetection"
+            class="captureButton"
+            type="button"
+            @click="manualCapture"
+            :aria-label="screenText.capture"
+          >
+            {{ screenText.capture }}
+          </button>
         </div>        
       </div>
 
@@ -282,17 +291,24 @@ async function runDetectionFromDataUrl(imageDataUrl) {
   });
 }
 
+function manualCapture() {
+  stopCountdown();
+  autoCaptureOnce();
+}
+
 /* Computed properties for text and styles */
 const textByLanguage = {
   en: {
     chooseObject: "Choose from list",
     previewHint: "Camera preview will appear here",
     home: "Home",
+    capture: "Capture now",
   },
   fr: {
     chooseObject: "Choisir un objet",
     previewHint: "Aperçu de la caméra ici",
     home: "Accueil",
+    capture: "Capturer",
   },
 };
 
@@ -408,6 +424,28 @@ const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr :
   border-radius: 18px;
   transform: scaleX(-1); /* Flips the camera horizontally */
   z-index: 1;
+}
+
+.captureButton {
+  margin-top: 20px;
+  padding: 12px 32px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  pointer-events: all;
+}
+
+.captureButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.7);
 }
 
 .snapshotPreview img {
