@@ -1,7 +1,30 @@
 <template>
-  <main class="screen fullStoryScreen" role="main" aria-label="Full story screen">
+  <main
+    class="screen fullStoryScreen"
+    role="main"
+    aria-label="Full story screen"
+    @touchstart="onTouchStart"
+    @touchend="onTouchEnd"
+  >
     <section class="contentArea" aria-labelledby="title">
       <div class="storyWrapper">
+
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <button class="breadcrumbLink" type="button" @click="router.push('/list')">
+            {{ props.language === "fr" ? "Parcourir" : "Browse" }}
+          </button>
+          <span class="breadcrumbSep">›</span>
+          <template v-if="contextObjectLabel">
+            <button class="breadcrumbLink" type="button" @click="goBackToStories">{{ contextObjectLabel }}</button>
+            <span class="breadcrumbSep">›</span>
+          </template>
+          <template v-if="contextThemeLabel">
+            <button class="breadcrumbLink" type="button" @click="goBackToStories">{{ contextThemeLabel }}</button>
+            <span class="breadcrumbSep">›</span>
+          </template>
+          <span class="breadcrumbCurrent">{{ title }}</span>
+        </nav>
 
         <!-- Header card -->
         <header class="storyHeader">
@@ -80,9 +103,30 @@
           </a>
         </footer>
 
+        <!-- Prev / Next navigation -->
+        <div v-if="storyList.length > 1" class="storyNav">
+          <button
+            class="navBtn"
+            type="button"
+            :disabled="!prevStory"
+            @click="navigateToStory(prevStory)"
+          >
+            ← {{ props.language === "fr" ? "Précédent" : "Previous" }}
+          </button>
+          <span class="navCount">{{ currentIndex + 1 }} / {{ storyList.length }}</span>
+          <button
+            class="navBtn"
+            type="button"
+            :disabled="!nextStory"
+            @click="navigateToStory(nextStory)"
+          >
+            {{ props.language === "fr" ? "Suivant" : "Next" }} →
+          </button>
+        </div>
+
         <div class="modalButtons">
-          <button class="mainButton backButton" type="button" @click="goBack">
-            ← {{ screenText.back }}
+          <button class="mainButton backButton" type="button" @click="goBackToStories">
+            ← {{ props.language === "fr" ? "Retour aux histoires" : "Back to stories" }}
           </button>
         </div>
 
@@ -92,12 +136,13 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { sampleStories } from "../../data/SampleStories";
 import { themes } from "../../data/Themes";
 import { objects } from "../../data/Objects";
 import { promptsByThemes } from "../../data/PromptsByThemes.js";
+import { objectThemeMap } from "../../data/ObjectThemeMap.js";
 
 const props = defineProps({
   language: { type: String, default: "en" },
@@ -191,6 +236,62 @@ const paragraphs = computed(() =>
     .filter(Boolean)
 );
 
+// Context from StoryScreen
+const contextObjectId = computed(() => String(route.query.objectId || "").trim());
+const contextThemeId = computed(() => String(route.query.themeId || "").trim());
+
+const contextObjectLabel = computed(() => {
+  if (!contextObjectId.value) return "";
+  const obj = objects.find((o) => o.id === contextObjectId.value);
+  return obj ? (props.language === "fr" ? obj.fr : obj.en) : "";
+});
+
+const contextThemeLabel = computed(() => {
+  if (!contextThemeId.value) return "";
+  const t = themes.find((t) => t.id === contextThemeId.value);
+  return t ? (props.language === "fr" ? t.fr : t.en) : "";
+});
+
+// Story list for swipe navigation (same logic as StoryScreen)
+const storyList = computed(() => {
+  if (contextThemeId.value) {
+    return sampleStories.filter((s) => s.theme?.includes(contextThemeId.value));
+  }
+  if (contextObjectId.value) {
+    const themeIds = objectThemeMap[contextObjectId.value] || [];
+    return sampleStories.filter((s) => s.theme?.some((t) => themeIds.includes(t)));
+  }
+  return sampleStories;
+});
+
+const currentIndex = computed(() => storyList.value.findIndex((s) => s.id === storyId.value));
+const prevStory = computed(() => currentIndex.value > 0 ? storyList.value[currentIndex.value - 1] : null);
+const nextStory = computed(() => currentIndex.value < storyList.value.length - 1 ? storyList.value[currentIndex.value + 1] : null);
+
+function navigateToStory(s) {
+  if (!s) return;
+  const query = {};
+  if (contextObjectId.value) query.objectId = contextObjectId.value;
+  if (contextThemeId.value) query.themeId = contextThemeId.value;
+  router.push({ path: `/stories/${s.id}`, query });
+}
+
+// Swipe detection
+const touchStartX = ref(0);
+function onTouchStart(e) { touchStartX.value = e.touches[0].clientX; }
+function onTouchEnd(e) {
+  const delta = touchStartX.value - e.changedTouches[0].clientX;
+  if (delta > 50 && nextStory.value) navigateToStory(nextStory.value);
+  else if (delta < -50 && prevStory.value) navigateToStory(prevStory.value);
+}
+
+function goBackToStories() {
+  const query = {};
+  if (contextObjectId.value) query.objectId = contextObjectId.value;
+  if (contextThemeId.value) query.themeId = contextThemeId.value;
+  router.push({ path: "/story", query });
+}
+
 function goBack() {
   router.back();
 }
@@ -214,6 +315,84 @@ function goBack() {
 .storyWrapper {
   width: min(760px, 96vw);
   text-align: left;
+}
+
+/* ── Breadcrumb ── */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.breadcrumbLink {
+  background: none;
+  border: none;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.15s;
+  font-family: "Inter", sans-serif;
+}
+
+.breadcrumbLink:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.breadcrumbSep {
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 13px;
+}
+
+.breadcrumbCurrent {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+/* ── Story navigation ── */
+.storyNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.navBtn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.navBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.11);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.navBtn:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.navCount {
+  font-size: 13px;
+  opacity: 0.45;
+  font-family: "Inter", sans-serif;
 }
 
 /* ── Header ── */

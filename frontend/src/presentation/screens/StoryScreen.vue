@@ -137,12 +137,31 @@ function getStoryInfo(field) {
   return props.language === "fr" ? field.fr : field.en;
 }
 
+const objectLabel = computed(() => {
+  if (!selectedObjectId.value) return "";
+  const obj = objects.find((o) => o.id === selectedObjectId.value);
+  return obj ? (props.language === "fr" ? obj.fr : obj.en) : "";
+});
+
+const themeLabel = computed(() => {
+  if (!selectedTheme.value) return "";
+  const theme = themes.find((t) => t.id === selectedTheme.value);
+  return theme ? (props.language === "fr" ? theme.fr : theme.en) : "";
+});
+
 function openStory(storyId) {
-  router.push(`/stories/${storyId}`);
+  const query = {};
+  if (selectedObjectId.value) query.objectId = selectedObjectId.value;
+  if (selectedTheme.value) query.themeId = selectedTheme.value;
+  router.push({ path: `/stories/${storyId}`, query });
 }
 
 function goToList() {
   router.push("/list");
+}
+
+function goToObjectStories() {
+  if (selectedObjectId.value) router.push({ path: "/story", query: { objectId: selectedObjectId.value } });
 }
 </script>
 
@@ -151,10 +170,64 @@ function goToList() {
   overflow-y: auto;
 }
 
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.breadcrumbLink {
+  background: none;
+  border: none;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.breadcrumbLink:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.breadcrumbSep {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.breadcrumbCurrent {
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+}
+
 .screenTitle {
   margin: 0;
   font-size: clamp(34px, 5.2vw, 64px);
   line-height: 1.04;
+}
+
+.emptyState {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  margin: 0 0 12px;
+}
+
+.emptyTitle {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.emptySubtext {
+  font-size: 15px;
+  opacity: 0.6;
+  margin: 0 0 24px;
 }
 
 .contentArea {
