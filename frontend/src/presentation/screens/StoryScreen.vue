@@ -37,8 +37,30 @@
           </article>
         </div>
 
-        <!-- Explore other objects -->
-        <div v-if="otherObjects.length" class="relatedSection">
+        <!-- Explore other themes (when browsing by theme only, no object) -->
+        <div v-if="!selectedObjectId && selectedTheme && otherThemes.length" class="relatedSection">
+          <h2 class="relatedTitle">{{ screenText.exploreOtherThemes }}</h2>
+          <div class="relatedList" role="list" aria-label="Explore other themes">
+            <button
+              v-for="theme in otherThemes"
+              :key="theme.id"
+              class="relatedBtn"
+              type="button"
+              @click="goToTheme(theme)"
+            >
+              <img
+                v-if="theme.icon"
+                :src="`/icons/${theme.icon}`"
+                :alt="props.language === 'fr' ? theme.fr : theme.en"
+                class="relatedBtnIcon"
+              />
+              {{ props.language === "fr" ? theme.fr : theme.en }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Explore other objects (when object is in context) -->
+        <div v-else-if="selectedObjectId && otherObjects.length" class="relatedSection">
           <h2 class="relatedTitle">{{ screenText.exploreOthers }}</h2>
           <div class="relatedList" role="list" aria-label="Explore other objects">
             <button
@@ -93,6 +115,7 @@ const textByLanguage = {
     explore: "Explore Story",
     list: "Back to List",
     exploreOthers: "Explore other objects",
+    exploreOtherThemes: "Explore other themes",
   },
   fr: {
     title: "Histoires",
@@ -101,6 +124,7 @@ const textByLanguage = {
     explore: "Explorer l'histoire",
     list: "Retour à la liste",
     exploreOthers: "Explorer d'autres objets",
+    exploreOtherThemes: "Explorer d'autres thèmes",
   },
 };
 
@@ -112,14 +136,15 @@ const selectedTheme = computed(() => String(route.query.themeId || "").trim());
 const selectedObjectId = computed(() => String(route.query.objectId || "").trim());
 
 const contextLabel = computed(() => {
-  if (selectedObjectId.value) {
-    const obj = objects.find((o) => o.id === selectedObjectId.value);
-    return obj ? (props.language === "fr" ? obj.fr : obj.en) : selectedObjectId.value;
-  }
-  if (selectedTheme.value) {
-    const theme = themes.find((t) => t.id === selectedTheme.value);
-    return theme ? (props.language === "fr" ? theme.fr : theme.en) : selectedTheme.value;
-  }
+  const obj = selectedObjectId.value ? objects.find((o) => o.id === selectedObjectId.value) : null;
+  const theme = selectedTheme.value ? themes.find((t) => t.id === selectedTheme.value) : null;
+
+  const objName = obj ? (props.language === "fr" ? obj.fr : obj.en) : "";
+  const themeName = theme ? (props.language === "fr" ? theme.fr : theme.en) : "";
+
+  if (objName && themeName) return `${objName} (${themeName})`;
+  if (objName) return objName;
+  if (themeName) return themeName;
   return "";
 });
 
@@ -148,7 +173,10 @@ function getStoryInfo(field) {
 }
 
 function openStory(storyId) {
-  router.push(`/stories/${storyId}`);
+  const query = {};
+  if (selectedObjectId.value) query.objectId = selectedObjectId.value;
+  if (selectedTheme.value) query.themeId = selectedTheme.value;
+  router.push({ path: `/stories/${storyId}`, query });
 }
 
 function goToList() {
@@ -164,11 +192,21 @@ const otherObjects = computed(() => {
     .map(({ o }) => o);
 });
 
+const otherThemes = computed(() => {
+  const filtered = themes.filter((t) => t.id !== selectedTheme.value);
+  return filtered
+    .map((t) => ({ t, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .slice(0, 5)
+    .map(({ t }) => t);
+});
+
 function goToRelatedObject(obj) {
-  router.push({
-    path: "/story",
-    query: { objectId: obj.id },
-  });
+  router.push({ path: "/story", query: { objectId: obj.id } });
+}
+
+function goToTheme(theme) {
+  router.push({ path: "/story", query: { themeId: theme.id } });
 }
 </script>
 

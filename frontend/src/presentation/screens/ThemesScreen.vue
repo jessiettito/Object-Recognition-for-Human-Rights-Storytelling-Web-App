@@ -115,15 +115,11 @@ onMounted(() => {
 });
 
 function goToStory() {
- 
   const themeId = (currentTheme.value?.id || "").trim();
 
   const query = {};
-  if (themeId) {
-    query.themeId = themeId;
-  } else if (selectedObjectId.value) {
-    query.objectId = selectedObjectId.value;
-  }
+  if (selectedObjectId.value) query.objectId = selectedObjectId.value;
+  if (themeId) query.themeId = themeId;
 
   router.push({ path: "/story", query });
 }
