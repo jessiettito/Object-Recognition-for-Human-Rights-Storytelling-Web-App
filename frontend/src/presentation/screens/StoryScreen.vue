@@ -2,9 +2,25 @@
   <main class="screen storySummaryScreen" role="main" aria-label="Story summary screen">
     <section class="contentArea" aria-labelledby="title">
       <div class="modalCard storyWrapper">
+
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <button class="breadcrumbLink" type="button" @click="goToList">{{ screenText.browse }}</button>
+          <span class="breadcrumbSep">›</span>
+          <span v-if="objectLabel" class="breadcrumbLink" @click="goToObjectStories">{{ objectLabel }}</span>
+          <template v-if="objectLabel && themeLabel">
+            <span class="breadcrumbSep">›</span>
+            <span class="breadcrumbCurrent">{{ themeLabel }}</span>
+          </template>
+          <span v-else-if="themeLabel" class="breadcrumbCurrent">{{ themeLabel }}</span>
+          <span v-else-if="objectLabel" class="breadcrumbCurrent"></span>
+          <span v-else class="breadcrumbCurrent">{{ screenText.title }}</span>
+        </nav>
+
         <h1 id="title" class="screenTitle">{{ screenText.title }}</h1>
 
-        <div class="storiesGrid">
+        <!-- Stories grid -->
+        <div v-if="stories.length" class="storiesGrid">
           <article
             v-for="story in stories"
             :key="story.id"
@@ -18,7 +34,7 @@
               </div>
 
               <h2 class="storyTitle">{{ getStoryInfo(story.title) }}</h2>
-              
+
               <p class="storySummary">{{ getStoryInfo(story.summary) }}</p>
 
               <div class="cardActions">
@@ -34,8 +50,15 @@
           </article>
         </div>
 
-        <div class="modalButtons">
-      
+        <!-- Empty state -->
+        <div v-else class="emptyState">
+          <p class="emptyIcon">📭</p>
+          <p class="emptyTitle">{{ screenText.emptyTitle }}</p>
+          <p class="emptySubtext">{{ screenText.emptySubtext }}</p>
+          <button class="mainButton" type="button" @click="goToList">{{ screenText.list }}</button>
+        </div>
+
+        <div v-if="stories.length" class="modalButtons">
           <button class="mainButton startButton" type="button" @click="goToList">
             {{ screenText.list }}
           </button>
@@ -50,6 +73,8 @@ import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { sampleStories } from "../../data/SampleStories";
 import { objectThemeMap } from "../../data/ObjectThemeMap.js";
+import { objects } from "../../data/Objects.js";
+import { themes } from "../../data/Themes.js";
 
 const props = defineProps({
   language: { type: String, default: "en" },
@@ -65,6 +90,9 @@ const textByLanguage = {
     by: "By",
     explore: "Explore Story",
     list: "Back to List",
+    browse: "Browse",
+    emptyTitle: "No stories found",
+    emptySubtext: "Try exploring a different object or theme.",
   },
   fr: {
     title: "Histoires",
@@ -72,6 +100,9 @@ const textByLanguage = {
     by: "Par",
     explore: "Explorer l'histoire",
     list: "Retour à la liste",
+    browse: "Parcourir",
+    emptyTitle: "Aucune histoire trouvée",
+    emptySubtext: "Essayez un autre objet ou thème.",
   },
 };
 
