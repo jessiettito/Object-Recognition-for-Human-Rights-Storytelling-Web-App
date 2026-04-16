@@ -7,7 +7,8 @@
     @touchend="onTouchEnd"
   >
     <section class="contentArea" aria-labelledby="title">
-      <div class="storyWrapper">
+      <Transition name="story" mode="out-in">
+      <div class="storyWrapper" :key="storyId">
 
         <!-- Breadcrumb -->
         <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -131,6 +132,7 @@
         </div>
 
       </div>
+      </Transition>
     </section>
   </main>
 </template>
@@ -315,6 +317,20 @@ function goBack() {
 .storyWrapper {
   width: min(760px, 96vw);
   text-align: left;
+}
+
+/* ── Story transition ── */
+.story-enter-active,
+.story-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.story-enter-from {
+  opacity: 0;
+  transform: translateX(30px);
+}
+.story-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
 }
 
 /* ── Breadcrumb ── */
