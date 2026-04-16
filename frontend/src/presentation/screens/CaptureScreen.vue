@@ -141,8 +141,7 @@ function startLiveDetection() {
     if (!cameraStarted.value || isRunningDetection.value || !video.value) return;
     if (video.value.readyState < 2) return;
     try {
-      const results = await detectObjectsWithBoxes(video.value, { topK: 3, ignorePerson: true, minScore: 0.3 });
-      drawDetections(results);
+      const results = await detectObjectsWithBoxes(video.value, { topK: 1, ignorePerson: true, minScore: 0.3 });
 
       const top = results[0];
       if (top && top.confidence >= MIN_CONFIDENCE) {
@@ -182,7 +181,6 @@ function stopLiveDetection() {
   stableLabel = "";
   stableStart = 0;
   stableProgress.value = 0;
-  clearDetections();
 }
 
 onMounted(async () => {
@@ -457,16 +455,6 @@ const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr :
   z-index: 1;
 }
 
-.overlayCanvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 18px;
-  transform: scaleX(-1); /* Mirror to match video */
-  z-index: 2;
-  pointer-events: none;
-}
 
 .snapshotPreview img {
   width: 100%;
