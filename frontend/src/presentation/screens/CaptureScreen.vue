@@ -29,20 +29,22 @@
           class="cameraVideo">
         </video>
 
+
         <div v-if="!cameraStarted" class="cameraHint">
           {{ screenText.previewHint }}
         </div>
 
-         <!-- Countdown timer -->
-        <div v-else class="countdownOverlay" aria-label="Auto capture countdown">
-          <div v-if="countdown > 0 && !isRunningDetection" class="countdownNumber">
-            {{ countdown }}
-          </div>
-          <div class="countdownSub" :class="{ bold: isRunningDetection }">
-            <span v-if="isRunningDetection">Processing…</span>
-            <span v-else>Hold still</span>
-          </div>
-        </div>        
+        <!-- Status overlay -->
+        <div v-if="cameraStarted" class="statusOverlay">
+          <span v-if="isRunningDetection" class="statusBadge">Processing…</span>
+          <span v-else-if="liveLabel" class="statusBadge statusBadge--active">{{ liveLabel }}</span>
+          <span v-else class="statusBadge statusBadge--idle">{{ screenText.aimHint }}</span>
+        </div>
+
+        <!-- Stability progress bar -->
+        <div v-if="stableProgress > 0 && !isRunningDetection" class="progressBar">
+          <div class="progressFill" :style="{ width: (stableProgress * 100) + '%' }"></div>
+        </div>
       </div>
 
       <canvas ref="canvas" style="display:none"></canvas>
@@ -55,7 +57,8 @@
 import { computed, ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 
-import { detectTopObjects } from "../../logic/ObjectDetection.js";
+import { detectTopObjects, detectObjectsWithBoxes } from "../../logic/ObjectDetection.js";
+
 
 const props = defineProps({
   appTitle: { type: String, default: "Human Rights Object Stories" },
@@ -64,7 +67,7 @@ const props = defineProps({
 
 const router = useRouter();
 
-const video = ref(null); 
+const video = ref(null);
 const canvas = ref(null);
 
 let stream = null; 
@@ -73,16 +76,17 @@ const cameraStarted = ref(false);
 const hiddenImageForDetection = ref(null);
 const isRunningDetection = ref(false);
 const detectionErrorMessage = ref("");
+const liveLabel = ref("");
+const stableProgress = ref(0); // 0–1
+let liveDetectTimerId = null;
+let stableLabel = "";
+let stableStart = 0;
+
+const STABLE_MS = 3000;
+const MIN_CONFIDENCE = 0.4;
 
 const CAMERA_REQUESTED_KEY = "cameraPermissionRequested";
 const CAMERA_GRANTED_KEY = "cameraPermissionGranted";
-
-/**
- * Auto-capture 
- */
-const COUNTDOWN_SECONDS = 5; 
-const countdown = ref(COUNTDOWN_SECONDS);
-let countdownTimerId = null; 
 
 
 /* Camera */
@@ -130,29 +134,55 @@ function stopCamera() {
   cameraStarted.value = false;
 }
 
-function startCountdown() {
-  stopCountdown(); 
-  countdown.value = COUNTDOWN_SECONDS; 
 
-  countdownTimerId = window.setInterval (async () => {
-    if(!cameraStarted.value) return; 
-    if(isRunningDetection.value) return; 
 
-    countdown.value -= 1; 
+function startLiveDetection() {
+  liveDetectTimerId = window.setInterval(async () => {
+    if (!cameraStarted.value || isRunningDetection.value || !video.value) return;
+    if (video.value.readyState < 2) return;
+    try {
+      const results = await detectObjectsWithBoxes(video.value, { topK: 3, ignorePerson: true, minScore: 0.3 });
+      drawDetections(results);
 
-    if(countdown.value <= 0) {
-      stopCountdown(); 
-      countdown.value = 0; 
-      await autoCaptureOnce(); 
+      const top = results[0];
+      if (top && top.confidence >= MIN_CONFIDENCE) {
+        const name = top.name;
+        liveLabel.value = name.charAt(0).toUpperCase() + name.slice(1);
+
+        if (name === stableLabel) {
+          const elapsed = Date.now() - stableStart;
+          stableProgress.value = Math.min(elapsed / STABLE_MS, 1);
+          if (elapsed >= STABLE_MS) {
+            stopLiveDetection();
+            await autoCaptureOnce();
+          }
+        } else {
+          stableLabel = name;
+          stableStart = Date.now();
+          stableProgress.value = 0;
+        }
+      } else {
+        liveLabel.value = "";
+        stableLabel = "";
+        stableStart = 0;
+        stableProgress.value = 0;
+      }
+    } catch {
+      // silently ignore live detection errors
     }
-  }, 1000);
+  }, 300);
 }
 
-function stopCountdown() {
-  if(countdownTimerId) {
-    window.clearInterval(countdownTimerId);
-    countdownTimerId = null; 
+function stopLiveDetection() {
+  if (liveDetectTimerId) {
+    window.clearInterval(liveDetectTimerId);
+    liveDetectTimerId = null;
   }
+  liveLabel.value = "";
+  stableLabel = "";
+  stableStart = 0;
+  stableProgress.value = 0;
+  clearDetections();
 }
 
 onMounted(async () => {
@@ -161,18 +191,18 @@ onMounted(async () => {
 
   if (!hasAskedBefore) {
     const ok = await startCamera();
-    if (ok) startCountdown(); 
+    if (ok) startLiveDetection();
     return;
   }
 
   if (cameraGrantedBefore) {
     const ok = await startCamera();
-    if (ok) startCountdown(); 
+    if (ok) startLiveDetection();
   }
 });
 
 onUnmounted(() => {
-  stopCountdown();
+  stopLiveDetection();
   stopCamera();
 });
 
@@ -191,21 +221,17 @@ async function autoCaptureOnce() {
 
   if (!video.value || !canvas.value) {
     detectionErrorMessage.value = "Camera is not ready. Please try again.";
-    startCountdown(); // Restart countdown to try again
+    startLiveDetection();
     return;
   }
 
-  try { 
-    countdown.value = 0;
-
+  try {
     isRunningDetection.value = true;
-
     const snapshotDataUrl = captureSnapshotDataUrl();
-
-    await runDetectionFromDataUrl(snapshotDataUrl); 
+    await runDetectionFromDataUrl(snapshotDataUrl);
   } catch (error) {
-    detectionErrorMessage.value = error?.message ?? "Something went wrong during detection."
-    startCountdown(); 
+    detectionErrorMessage.value = error?.message ?? "Something went wrong during detection.";
+    startLiveDetection();
   } finally {
     // Stop the camera stream after capturing
     isRunningDetection.value = false;
@@ -288,11 +314,13 @@ const textByLanguage = {
     chooseObject: "Choose from list",
     previewHint: "Camera preview will appear here",
     home: "Home",
+    aimHint: "Aim at an object",
   },
   fr: {
     chooseObject: "Choisir un objet",
     previewHint: "Aperçu de la caméra ici",
     home: "Accueil",
+    aimHint: "Pointez vers un objet",
   },
 };
 
@@ -346,39 +374,58 @@ const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr :
   z-index: 3;
 }
 
-.countdownOverlay {
+.statusOverlay {
   position: absolute;
-  inset: 0; 
-  display: grid; 
-  place-items: center;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
   pointer-events: none;
-  text-align: center;
-  z-index: 10; 
 }
 
-.countdownNumber {
-  font-size: clamp(64px, 10vw, 120px);
-  font-weight: 900;
-  color: #ffffff;
-  text-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
-  background: rgba(0, 0, 0, 0.45);
-  padding: 10px 18px; 
-  border-radius: 999px;
-  backdrop-filter: blur(8px);
-}
-
-.countdownSub {
-  margin-top: 10px;
-  font-size: 12px;
-  letter-spacing: 0.12em; 
-  text-transform: uppercase;
-  opacity: 0.9; 
-  background: rgba(0, 0, 0, 0.25);
-  padding: 8px 14px;
-  border-radius: 999px;
-  backdrop-filter: blur(8px);
+.statusBadge {
+  display: inline-block;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 8px 20px;
+  border-radius: 999px;
+  white-space: nowrap;
 }
+
+.statusBadge--active {
+  border-color: rgba(167, 243, 208, 0.5);
+  color: #a7f3d0;
+}
+
+.statusBadge--idle {
+  opacity: 0.7;
+  font-weight: 500;
+}
+
+.progressBar {
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  right: 18px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #6ee7b7, #a7f3d0);
+  border-radius: 999px;
+  transition: width 0.2s ease;
+}
+
 
 .topControls {
   width: min(920px, 98vw);
@@ -403,11 +450,22 @@ const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr :
   width: 100%;
   height: 100%;
   position: relative;
-  overflow : hidden;
+  overflow: hidden;
   object-fit: cover;
   border-radius: 18px;
   transform: scaleX(-1); /* Flips the camera horizontally */
   z-index: 1;
+}
+
+.overlayCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  transform: scaleX(-1); /* Mirror to match video */
+  z-index: 2;
+  pointer-events: none;
 }
 
 .snapshotPreview img {

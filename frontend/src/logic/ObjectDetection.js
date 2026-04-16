@@ -90,3 +90,33 @@ export async function detectMainObject(imageElement) {
   const top = await detectTopObjects(imageElement, { topK: 1, ignorePerson: true });
   return top.length ? top[0] : null;
 }
+
+/**
+ * Like detectTopObjects but also returns bounding boxes.
+ * @param {HTMLImageElement|HTMLVideoElement|HTMLCanvasElement} imageElement
+ * @param {{ topK?: number, ignorePerson?: boolean, minScore?: number }} options
+ * @returns {Promise<Array<{ name: string, confidence: number, bbox: [number, number, number, number] }>>}
+ */
+export async function detectObjectsWithBoxes(imageElement, options = {}) {
+  const { topK = 5, ignorePerson = true, minScore = 0.1 } = options;
+
+  await initializeBackendIfNeeded();
+  const model = await loadModelIfNeeded();
+
+  const predictions = await model.detect(imageElement);
+
+  const filtered = (predictions || [])
+    .filter((p) => p && typeof p.score === "number" && p.score >= minScore);
+
+  const withoutPerson = filtered.filter((p) => p.class !== "person");
+  const finalList = ignorePerson && withoutPerson.length > 0 ? withoutPerson : filtered;
+
+  return finalList
+    .sort((a, b) => b.score - a.score)
+    .slice(0, topK)
+    .map((p) => ({
+      name: p.class,
+      confidence: p.score,
+      bbox: p.bbox, // [x, y, width, height] in natural video coordinates
+    }));
+}
