@@ -2,7 +2,10 @@
   <main class="screen storySummaryScreen" role="main" aria-label="Story summary screen">
     <section class="contentArea" aria-labelledby="title">
       <div class="modalCard storyWrapper">
-        <h1 id="title" class="screenTitle">{{ screenText.title }}</h1>
+        <h1 id="title" class="screenTitle">
+          <span class="titlePrefix">{{ screenText.title }}:</span>
+          <span v-if="contextLabel" class="titleContext"> {{ contextLabel }}</span>
+        </h1>
 
         <div class="storiesGrid">
           <article
@@ -34,8 +37,30 @@
           </article>
         </div>
 
+        <!-- Explore other objects -->
+        <div v-if="otherObjects.length" class="relatedSection">
+          <h2 class="relatedTitle">{{ screenText.exploreOthers }}</h2>
+          <div class="relatedList" role="list" aria-label="Explore other objects">
+            <button
+              v-for="obj in otherObjects"
+              :key="obj.id"
+              class="relatedBtn"
+              type="button"
+              @click="goToRelatedObject(obj)"
+            >
+              <img
+                v-if="obj.icon"
+                :src="`/icons/${obj.icon}`"
+                :alt="obj.en"
+                class="relatedBtnIcon"
+              />
+              {{ obj.en }}
+            </button>
+          </div>
+        </div>
+
         <div class="modalButtons">
-      
+
           <button class="mainButton startButton" type="button" @click="goToList">
             {{ screenText.list }}
           </button>
@@ -50,6 +75,8 @@ import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { sampleStories } from "../../data/SampleStories";
 import { objectThemeMap } from "../../data/ObjectThemeMap.js";
+import { objects } from "../../data/Objects.js";
+import { themes } from "../../data/Themes.js";
 
 const props = defineProps({
   language: { type: String, default: "en" },
@@ -65,6 +92,7 @@ const textByLanguage = {
     by: "By",
     explore: "Explore Story",
     list: "Back to List",
+    exploreOthers: "Explore other objects",
   },
   fr: {
     title: "Histoires",
@@ -72,6 +100,7 @@ const textByLanguage = {
     by: "Par",
     explore: "Explorer l'histoire",
     list: "Retour à la liste",
+    exploreOthers: "Explorer d'autres objets",
   },
 };
 
@@ -81,6 +110,18 @@ const screenText = computed(() =>
 
 const selectedTheme = computed(() => String(route.query.themeId || "").trim());
 const selectedObjectId = computed(() => String(route.query.objectId || "").trim());
+
+const contextLabel = computed(() => {
+  if (selectedObjectId.value) {
+    const obj = objects.find((o) => o.id === selectedObjectId.value);
+    return obj ? (props.language === "fr" ? obj.fr : obj.en) : selectedObjectId.value;
+  }
+  if (selectedTheme.value) {
+    const theme = themes.find((t) => t.id === selectedTheme.value);
+    return theme ? (props.language === "fr" ? theme.fr : theme.en) : selectedTheme.value;
+  }
+  return "";
+});
 
 function getStoryThemeIds(story) {
   return Array.isArray(story.theme) ? story.theme : [];
@@ -113,6 +154,22 @@ function openStory(storyId) {
 function goToList() {
   router.push("/list");
 }
+
+const otherObjects = computed(() => {
+  const filtered = objects.filter((o) => o.id !== selectedObjectId.value);
+  return filtered
+    .map((o) => ({ o, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .slice(0, 5)
+    .map(({ o }) => o);
+});
+
+function goToRelatedObject(obj) {
+  router.push({
+    path: "/story",
+    query: { objectId: obj.id },
+  });
+}
 </script>
 
 <style scoped>
@@ -124,6 +181,10 @@ function goToList() {
   margin: 0;
   font-size: clamp(34px, 5.2vw, 64px);
   line-height: 1.04;
+}
+
+.titleContext {
+  opacity: 0.6;
 }
 
 .contentArea {
@@ -207,6 +268,53 @@ function goToList() {
 .exploreButton {
   min-width: 190px;
   background: linear-gradient(90deg, #fde68a, #93c5fd);
+}
+
+.relatedSection {
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.relatedTitle {
+  margin: 0 0 16px;
+  font-size: clamp(18px, 2.4vw, 26px);
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+.relatedList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.relatedBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.relatedBtnIcon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.relatedBtn:hover {
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
 }
 
 @media (max-width: 768px) {
