@@ -53,3 +53,23 @@ export const objectThemeMap = {
 export function getThemeIdsForObject(objectId) {
   return objectThemeMap[objectId] || [];
 }
+
+/**
+ * Returns IDs of objects that share at least one theme with the given object,
+ * sorted by number of shared themes (most related first).
+ */
+export function getRelatedObjectIds(objectId, { limit = 5 } = {}) {
+  const sourceThemes = new Set(objectThemeMap[objectId] || []);
+  if (!sourceThemes.size) return [];
+
+  return Object.entries(objectThemeMap)
+    .filter(([id]) => id !== objectId)
+    .map(([id, themes]) => ({
+      id,
+      shared: themes.filter((t) => sourceThemes.has(t)).length,
+    }))
+    .filter(({ shared }) => shared > 0)
+    .sort((a, b) => b.shared - a.shared)
+    .slice(0, limit)
+    .map(({ id }) => id);
+}
