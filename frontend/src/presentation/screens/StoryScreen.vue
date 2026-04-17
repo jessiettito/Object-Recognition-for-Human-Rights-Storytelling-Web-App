@@ -2,12 +2,28 @@
   <main class="screen storySummaryScreen" role="main" aria-label="Story summary screen">
     <section class="contentArea" aria-labelledby="title">
       <div class="modalCard storyWrapper">
+
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <button class="breadcrumbLink" type="button" @click="goToList">{{ screenText.browse }}</button>
+          <span class="breadcrumbSep">›</span>
+          <span v-if="objectLabel" class="breadcrumbLink" @click="goToObjectStories">{{ objectLabel }}</span>
+          <template v-if="objectLabel && themeLabel">
+            <span class="breadcrumbSep">›</span>
+            <span class="breadcrumbCurrent">{{ themeLabel }}</span>
+          </template>
+          <span v-else-if="themeLabel" class="breadcrumbCurrent">{{ themeLabel }}</span>
+          <span v-else-if="objectLabel" class="breadcrumbCurrent"></span>
+          <span v-else class="breadcrumbCurrent">{{ screenText.title }}</span>
+        </nav>
+
         <h1 id="title" class="screenTitle">
           <span class="titlePrefix">{{ screenText.title }}:</span>
           <span v-if="contextLabel" class="titleContext"> {{ contextLabel }}</span>
         </h1>
 
-        <div class="storiesGrid">
+        <!-- Stories grid -->
+        <div v-if="stories.length" class="storiesGrid">
           <article
             v-for="story in stories"
             :key="story.id"
@@ -21,7 +37,7 @@
               </div>
 
               <h2 class="storyTitle">{{ getStoryInfo(story.title) }}</h2>
-              
+
               <p class="storySummary">{{ getStoryInfo(story.summary) }}</p>
 
               <div class="cardActions">
@@ -73,16 +89,23 @@
               <img
                 v-if="obj.icon"
                 :src="`/icons/${obj.icon}`"
-                :alt="obj.en"
+                :alt="props.language === 'fr' ? obj.fr : obj.en"
                 class="relatedBtnIcon"
               />
-              {{ obj.en }}
+              {{ props.language === "fr" ? obj.fr : obj.en }}
             </button>
           </div>
         </div>
 
-        <div class="modalButtons">
+        <!-- Empty state -->
+        <div v-else class="emptyState">
+          <p class="emptyIcon">📭</p>
+          <p class="emptyTitle">{{ screenText.emptyTitle }}</p>
+          <p class="emptySubtext">{{ screenText.emptySubtext }}</p>
+          <button class="mainButton" type="button" @click="goToList">{{ screenText.list }}</button>
+        </div>
 
+        <div class="modalButtons">
           <button class="mainButton startButton" type="button" @click="goToList">
             {{ screenText.list }}
           </button>
@@ -114,6 +137,9 @@ const textByLanguage = {
     by: "By",
     explore: "Explore Story",
     list: "Back to List",
+    browse: "Browse",
+    emptyTitle: "No stories found",
+    emptySubtext: "Try exploring a different object or theme.",
     exploreOthers: "Explore other objects",
     exploreOtherThemes: "Explore other themes",
   },
@@ -123,6 +149,9 @@ const textByLanguage = {
     by: "Par",
     explore: "Explorer l'histoire",
     list: "Retour à la liste",
+    browse: "Parcourir",
+    emptyTitle: "Aucune histoire trouvée",
+    emptySubtext: "Essayez un autre objet ou thème.",
     exploreOthers: "Explorer d'autres objets",
     exploreOtherThemes: "Explorer d'autres thèmes",
   },
@@ -172,6 +201,18 @@ function getStoryInfo(field) {
   return props.language === "fr" ? field.fr : field.en;
 }
 
+const objectLabel = computed(() => {
+  if (!selectedObjectId.value) return "";
+  const obj = objects.find((o) => o.id === selectedObjectId.value);
+  return obj ? (props.language === "fr" ? obj.fr : obj.en) : "";
+});
+
+const themeLabel = computed(() => {
+  if (!selectedTheme.value) return "";
+  const theme = themes.find((t) => t.id === selectedTheme.value);
+  return theme ? (props.language === "fr" ? theme.fr : theme.en) : "";
+});
+
 function openStory(storyId) {
   const query = {};
   if (selectedObjectId.value) query.objectId = selectedObjectId.value;
@@ -208,11 +249,47 @@ function goToRelatedObject(obj) {
 function goToTheme(theme) {
   router.push({ path: "/story", query: { themeId: theme.id } });
 }
+
+function goToObjectStories() {
+  if (selectedObjectId.value) router.push({ path: "/story", query: { objectId: selectedObjectId.value } });
+}
 </script>
 
 <style scoped>
 .storySummaryScreen {
   overflow-y: auto;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.breadcrumbLink {
+  background: none;
+  border: none;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.breadcrumbLink:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.breadcrumbSep {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.breadcrumbCurrent {
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
 }
 
 .screenTitle {
@@ -226,6 +303,28 @@ function goToTheme(theme) {
   font-size: 0.6em;
   font-style: italic;
   margin-left: 0.4em;
+}
+
+.emptyState {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  margin: 0 0 12px;
+}
+
+.emptyTitle {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.emptySubtext {
+  font-size: 15px;
+  opacity: 0.6;
+  margin: 0 0 24px;
 }
 
 .contentArea {

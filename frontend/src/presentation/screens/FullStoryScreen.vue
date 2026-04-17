@@ -1,7 +1,31 @@
 <template>
-  <main class="screen fullStoryScreen" role="main" aria-label="Full story screen">
+  <main
+    class="screen fullStoryScreen"
+    role="main"
+    aria-label="Full story screen"
+    @touchstart="onTouchStart"
+    @touchend="onTouchEnd"
+  >
     <section class="contentArea" aria-labelledby="title">
-      <div class="storyWrapper">
+      <Transition name="story" mode="out-in">
+      <div class="storyWrapper" :key="storyId">
+
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <button class="breadcrumbLink" type="button" @click="router.push('/list')">
+            {{ props.language === "fr" ? "Parcourir" : "Browse" }}
+          </button>
+          <span class="breadcrumbSep">›</span>
+          <template v-if="contextObjectLabel">
+            <button class="breadcrumbLink" type="button" @click="goBackToStories">{{ contextObjectLabel }}</button>
+            <span class="breadcrumbSep">›</span>
+          </template>
+          <template v-if="contextThemeLabel">
+            <button class="breadcrumbLink" type="button" @click="goBackToStories">{{ contextThemeLabel }}</button>
+            <span class="breadcrumbSep">›</span>
+          </template>
+          <span class="breadcrumbCurrent">{{ title }}</span>
+        </nav>
 
         <!-- Header card -->
         <header class="storyHeader">
@@ -80,16 +104,25 @@
           </a>
         </footer>
 
-        <!-- Related story -->
-        <div v-if="relatedStory" class="relatedStorySection">
-          <p class="relatedStoryLabel">{{ props.language === "fr" ? "Lire une autre histoire" : "Read another story" }}</p>
-          <div class="relatedStoryCard" role="article">
-            <p v-if="relatedCategory" class="relatedCategory">{{ relatedCategory }}</p>
-            <h2 class="relatedTitle">{{ relatedTitle }}</h2>
-            <button class="mainButton relatedStoryBtn" type="button" @click="openRelatedStory">
-              {{ props.language === "fr" ? "Lire l'histoire →" : "Read story →" }}
-            </button>
-          </div>
+        <!-- Prev / Next navigation -->
+        <div v-if="storyList.length > 1" class="storyNav">
+          <button
+            class="navBtn"
+            type="button"
+            :disabled="!prevStory"
+            @click="navigateToStory(prevStory)"
+          >
+            ← {{ props.language === "fr" ? "Précédent" : "Previous" }}
+          </button>
+          <span class="navCount">{{ currentIndex + 1 }} / {{ storyList.length }}</span>
+          <button
+            class="navBtn"
+            type="button"
+            :disabled="!nextStory"
+            @click="navigateToStory(nextStory)"
+          >
+            {{ props.language === "fr" ? "Suivant" : "Next" }} →
+          </button>
         </div>
 
         <div class="modalButtons">
@@ -99,12 +132,13 @@
         </div>
 
       </div>
+      </Transition>
     </section>
   </main>
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { sampleStories } from "../../data/SampleStories";
 import { themes } from "../../data/Themes";
@@ -208,44 +242,56 @@ const paragraphs = computed(() =>
 const contextObjectId = computed(() => String(route.query.objectId || "").trim());
 const contextThemeId = computed(() => String(route.query.themeId || "").trim());
 
-const relatedStory = computed(() => {
-  // Build the set of relevant theme IDs:
-  // if a specific theme was selected, use only that;
-  // otherwise use all themes mapped to the object;
-  // fall back to the current story's own themes.
-  let relevantThemes = [];
-  if (contextThemeId.value) {
-    relevantThemes = [contextThemeId.value];
-  } else if (contextObjectId.value) {
-    relevantThemes = objectThemeMap[contextObjectId.value] || [];
-  }
-  if (!relevantThemes.length) {
-    relevantThemes = story.value?.theme || [];
-  }
-
-  const candidates = sampleStories.filter(
-    (s) => s.id !== storyId.value && s.theme?.some((t) => relevantThemes.includes(t))
-  );
-  if (!candidates.length) return null;
-  return candidates[Math.floor(Math.random() * candidates.length)];
-});
-
-const relatedTitle = computed(() => getStoryInfo(relatedStory.value?.title));
-const relatedCategory = computed(() => getStoryInfo(relatedStory.value?.category));
-
-function openRelatedStory() {
-  if (!relatedStory.value) return;
-  const query = {};
-  if (contextObjectId.value) query.objectId = contextObjectId.value;
-  if (contextThemeId.value) query.themeId = contextThemeId.value;
-  router.push({ path: `/stories/${relatedStory.value.id}`, query });
-}
-
 function goBackToStories() {
   const query = {};
   if (contextObjectId.value) query.objectId = contextObjectId.value;
   if (contextThemeId.value) query.themeId = contextThemeId.value;
   router.push({ path: "/story", query });
+}
+
+const contextObjectLabel = computed(() => {
+  if (!contextObjectId.value) return "";
+  const obj = objects.find((o) => o.id === contextObjectId.value);
+  return obj ? (props.language === "fr" ? obj.fr : obj.en) : "";
+});
+
+const contextThemeLabel = computed(() => {
+  if (!contextThemeId.value) return "";
+  const t = themes.find((t) => t.id === contextThemeId.value);
+  return t ? (props.language === "fr" ? t.fr : t.en) : "";
+});
+
+// Story list for swipe navigation (same logic as StoryScreen)
+const storyList = computed(() => {
+  if (contextThemeId.value) {
+    return sampleStories.filter((s) => s.theme?.includes(contextThemeId.value));
+  }
+  if (contextObjectId.value) {
+    const themeIds = objectThemeMap[contextObjectId.value] || [];
+    return sampleStories.filter((s) => s.theme?.some((t) => themeIds.includes(t)));
+  }
+  return sampleStories;
+});
+
+const currentIndex = computed(() => storyList.value.findIndex((s) => s.id === storyId.value));
+const prevStory = computed(() => currentIndex.value > 0 ? storyList.value[currentIndex.value - 1] : null);
+const nextStory = computed(() => currentIndex.value < storyList.value.length - 1 ? storyList.value[currentIndex.value + 1] : null);
+
+function navigateToStory(s) {
+  if (!s) return;
+  const query = {};
+  if (contextObjectId.value) query.objectId = contextObjectId.value;
+  if (contextThemeId.value) query.themeId = contextThemeId.value;
+  router.push({ path: `/stories/${s.id}`, query });
+}
+
+// Swipe detection
+const touchStartX = ref(0);
+function onTouchStart(e) { touchStartX.value = e.touches[0].clientX; }
+function onTouchEnd(e) {
+  const delta = touchStartX.value - e.changedTouches[0].clientX;
+  if (delta > 50 && nextStory.value) navigateToStory(nextStory.value);
+  else if (delta < -50 && prevStory.value) navigateToStory(prevStory.value);
 }
 
 function goBack() {
@@ -271,6 +317,98 @@ function goBack() {
 .storyWrapper {
   width: min(760px, 96vw);
   text-align: left;
+}
+
+/* ── Story transition ── */
+.story-enter-active,
+.story-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.story-enter-from {
+  opacity: 0;
+  transform: translateX(30px);
+}
+.story-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+/* ── Breadcrumb ── */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.breadcrumbLink {
+  background: none;
+  border: none;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.15s;
+  font-family: "Inter", sans-serif;
+}
+
+.breadcrumbLink:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.breadcrumbSep {
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 13px;
+}
+
+.breadcrumbCurrent {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+/* ── Story navigation ── */
+.storyNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.navBtn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.navBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.11);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.navBtn:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.navCount {
+  font-size: 13px;
+  opacity: 0.45;
+  font-family: "Inter", sans-serif;
 }
 
 /* ── Header ── */
@@ -473,59 +611,6 @@ function goBack() {
 
 .referenceLink:hover {
   color: #bfdbfe;
-}
-
-/* ── Related story ── */
-.relatedStorySection {
-  margin-top: 48px;
-  padding-top: 32px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.relatedStoryLabel {
-  font-family: "DM Sans", "Inter", sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #64748b;
-  margin: 0 0 14px;
-}
-
-.relatedStoryCard {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 20px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.relatedCategory {
-  margin: 0;
-  font-family: "Inter", sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #93c5fd;
-}
-
-.relatedTitle {
-  margin: 0;
-  font-family: "Playfair Display", Georgia, serif;
-  font-size: clamp(18px, 2.5vw, 24px);
-  font-weight: 700;
-  color: #f8fafc;
-  line-height: 1.2;
-}
-
-.relatedStoryBtn {
-  align-self: flex-start;
-  margin-top: 4px;
-  padding: 10px 20px;
-  font-size: 14px;
 }
 
 /* ── Back button ── */

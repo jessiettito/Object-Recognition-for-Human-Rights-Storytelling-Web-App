@@ -25,3 +25,4 @@ import AppHeader from "./components/Header.vue";
 const appTitle = "Human Rights Object Stories";
 const currentLanguage = ref("en"); // shared language for all screens
 </script>
+
