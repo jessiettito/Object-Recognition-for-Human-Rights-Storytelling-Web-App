@@ -104,18 +104,6 @@
           </a>
         </footer>
 
-        <!-- Related story -->
-        <div v-if="relatedStory" class="relatedStorySection">
-          <p class="relatedStoryLabel">{{ props.language === "fr" ? "Lire une autre histoire" : "Read another story" }}</p>
-          <div class="relatedStoryCard" role="article">
-            <p v-if="relatedCategory" class="relatedCategory">{{ relatedCategory }}</p>
-            <h2 class="relatedTitle">{{ relatedTitle }}</h2>
-            <button class="mainButton relatedStoryBtn" type="button" @click="openRelatedStory">
-              {{ props.language === "fr" ? "Lire l'histoire →" : "Read story →" }}
-            </button>
-          </div>
-        </div>
-
         <!-- Prev / Next navigation -->
         <div v-if="storyList.length > 1" class="storyNav">
           <button
@@ -254,49 +242,12 @@ const paragraphs = computed(() =>
 const contextObjectId = computed(() => String(route.query.objectId || "").trim());
 const contextThemeId = computed(() => String(route.query.themeId || "").trim());
 
-const relatedStory = computed(() => {
-  // Build the set of relevant theme IDs:
-  // if a specific theme was selected, use only that;
-  // otherwise use all themes mapped to the object;
-  // fall back to the current story's own themes.
-  let relevantThemes = [];
-  if (contextThemeId.value) {
-    relevantThemes = [contextThemeId.value];
-  } else if (contextObjectId.value) {
-    relevantThemes = objectThemeMap[contextObjectId.value] || [];
-  }
-  if (!relevantThemes.length) {
-    relevantThemes = story.value?.theme || [];
-  }
-
-  const candidates = sampleStories.filter(
-    (s) => s.id !== storyId.value && s.theme?.some((t) => relevantThemes.includes(t))
-  );
-  if (!candidates.length) return null;
-  return candidates[Math.floor(Math.random() * candidates.length)];
-});
-
-const relatedTitle = computed(() => getStoryInfo(relatedStory.value?.title));
-const relatedCategory = computed(() => getStoryInfo(relatedStory.value?.category));
-
-function openRelatedStory() {
-  if (!relatedStory.value) return;
-  const query = {};
-  if (contextObjectId.value) query.objectId = contextObjectId.value;
-  if (contextThemeId.value) query.themeId = contextThemeId.value;
-  router.push({ path: `/stories/${relatedStory.value.id}`, query });
-}
-
 function goBackToStories() {
   const query = {};
   if (contextObjectId.value) query.objectId = contextObjectId.value;
   if (contextThemeId.value) query.themeId = contextThemeId.value;
   router.push({ path: "/story", query });
 }
-
-// Context from StoryScreen
-const contextObjectId = computed(() => String(route.query.objectId || "").trim());
-const contextThemeId = computed(() => String(route.query.themeId || "").trim());
 
 const contextObjectLabel = computed(() => {
   if (!contextObjectId.value) return "";
@@ -341,13 +292,6 @@ function onTouchEnd(e) {
   const delta = touchStartX.value - e.changedTouches[0].clientX;
   if (delta > 50 && nextStory.value) navigateToStory(nextStory.value);
   else if (delta < -50 && prevStory.value) navigateToStory(prevStory.value);
-}
-
-function goBackToStories() {
-  const query = {};
-  if (contextObjectId.value) query.objectId = contextObjectId.value;
-  if (contextThemeId.value) query.themeId = contextThemeId.value;
-  router.push({ path: "/story", query });
 }
 
 function goBack() {
@@ -667,59 +611,6 @@ function goBack() {
 
 .referenceLink:hover {
   color: #bfdbfe;
-}
-
-/* ── Related story ── */
-.relatedStorySection {
-  margin-top: 48px;
-  padding-top: 32px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.relatedStoryLabel {
-  font-family: "DM Sans", "Inter", sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #64748b;
-  margin: 0 0 14px;
-}
-
-.relatedStoryCard {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 20px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.relatedCategory {
-  margin: 0;
-  font-family: "Inter", sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #93c5fd;
-}
-
-.relatedTitle {
-  margin: 0;
-  font-family: "Playfair Display", Georgia, serif;
-  font-size: clamp(18px, 2.5vw, 24px);
-  font-weight: 700;
-  color: #f8fafc;
-  line-height: 1.2;
-}
-
-.relatedStoryBtn {
-  align-self: flex-start;
-  margin-top: 4px;
-  padding: 10px 20px;
-  font-size: 14px;
 }
 
 /* ── Back button ── */

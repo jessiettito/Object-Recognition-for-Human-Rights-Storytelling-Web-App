@@ -17,7 +17,10 @@
           <span v-else class="breadcrumbCurrent">{{ screenText.title }}</span>
         </nav>
 
-        <h1 id="title" class="screenTitle">{{ screenText.title }}</h1>
+        <h1 id="title" class="screenTitle">
+          <span class="titlePrefix">{{ screenText.title }}:</span>
+          <span v-if="contextLabel" class="titleContext"> {{ contextLabel }}</span>
+        </h1>
 
         <!-- Stories grid -->
         <div v-if="stories.length" class="storiesGrid">
@@ -86,10 +89,10 @@
               <img
                 v-if="obj.icon"
                 :src="`/icons/${obj.icon}`"
-                :alt="obj.en"
+                :alt="props.language === 'fr' ? obj.fr : obj.en"
                 class="relatedBtnIcon"
               />
-              {{ obj.en }}
+              {{ props.language === "fr" ? obj.fr : obj.en }}
             </button>
           </div>
         </div>
@@ -102,7 +105,7 @@
           <button class="mainButton" type="button" @click="goToList">{{ screenText.list }}</button>
         </div>
 
-        <div v-if="stories.length" class="modalButtons">
+        <div class="modalButtons">
           <button class="mainButton startButton" type="button" @click="goToList">
             {{ screenText.list }}
           </button>
@@ -117,8 +120,6 @@ import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { sampleStories } from "../../data/SampleStories";
 import { objectThemeMap } from "../../data/ObjectThemeMap.js";
-import { objects } from "../../data/Objects.js";
-import { themes } from "../../data/Themes.js";
 import { objects } from "../../data/Objects.js";
 import { themes } from "../../data/Themes.js";
 
@@ -216,10 +217,7 @@ function openStory(storyId) {
   const query = {};
   if (selectedObjectId.value) query.objectId = selectedObjectId.value;
   if (selectedTheme.value) query.themeId = selectedTheme.value;
-  const query = {};
-  if (selectedObjectId.value) query.objectId = selectedObjectId.value;
-  if (selectedTheme.value) query.themeId = selectedTheme.value;
-  router.push({ path: { path: `/stories/${storyId}`, query }, query });
+  router.push({ path: `/stories/${storyId}`, query });
 }
 
 function goToList() {
