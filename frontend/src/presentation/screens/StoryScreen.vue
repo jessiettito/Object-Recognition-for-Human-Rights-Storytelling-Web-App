@@ -224,6 +224,8 @@ function goToTheme(theme) {
 .titleContext {
   opacity: 0.6;
   font-size: 0.6em;
+  font-style: italic;
+  margin-left: 0.4em;
 }
 
 .contentArea {
