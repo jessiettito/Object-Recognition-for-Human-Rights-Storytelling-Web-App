@@ -216,13 +216,14 @@ function goToTheme(theme) {
 }
 
 .screenTitle {
-  margin: 0;
+  margin: 0 0 24px 0;
   font-size: clamp(34px, 5.2vw, 64px);
   line-height: 1.04;
 }
 
 .titleContext {
   opacity: 0.6;
+  font-size: 0.6em;
 }
 
 .contentArea {
