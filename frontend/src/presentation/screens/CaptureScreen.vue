@@ -87,7 +87,8 @@ let liveDetectTimerId = null;
 let stableLabel = "";
 let stableStart = 0;
 
-const STABLE_MS = 3000;
+const PRE_STABLE_MS = 1000; // quiet period before countdown appears
+const STABLE_MS = 3000;     // countdown duration
 const MIN_CONFIDENCE = 0.25;
 
 const CAMERA_REQUESTED_KEY = "cameraPermissionRequested";
@@ -155,8 +156,9 @@ function startLiveDetection() {
 
         if (name === stableLabel) {
           const elapsed = Date.now() - stableStart;
-          stableProgress.value = Math.min(elapsed / STABLE_MS, 1);
-          if (elapsed >= STABLE_MS) {
+          const countdownElapsed = elapsed - PRE_STABLE_MS;
+          stableProgress.value = countdownElapsed > 0 ? Math.min(countdownElapsed / STABLE_MS, 1) : 0;
+          if (elapsed >= PRE_STABLE_MS + STABLE_MS) {
             stopLiveDetection();
             await autoCaptureOnce();
           }
@@ -196,13 +198,13 @@ onMounted(async () => {
 
   if (!hasAskedBefore) {
     const ok = await startCamera();
-    if (ok) setTimeout(startLiveDetection, 3000);
+    if (ok) setTimeout(startLiveDetection, 1000);
     return;
   }
 
   if (cameraGrantedBefore) {
     const ok = await startCamera();
-    if (ok) setTimeout(startLiveDetection, 3000);
+    if (ok) setTimeout(startLiveDetection, 1000);
   }
 });
 
