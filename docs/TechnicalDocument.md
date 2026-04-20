@@ -28,7 +28,7 @@
 * **Frontend ←→ Backend communication:** REST APIs  
 * **Object Detection:** TensorFlow.js (COCO-SSD model)  
 * **Data Source:** Internal JSON   
-* Here is the link to the Architecture diagram. 
+* [Here is the link to the Architecture diagram](https://github.com/jessiettito/Object-Recognition-for-Human-Rights-Storytelling-Web-App/blob/main/docs/SystemDiagram.md)
 
 ---
 
