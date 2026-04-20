@@ -41,6 +41,11 @@
           <span v-else class="statusBadge statusBadge--idle">{{ screenText.aimHint }}</span>
         </div>
 
+        <!-- Countdown overlay -->
+        <div v-if="stableProgress > 0 && !isRunningDetection" class="countdownOverlay">
+          <span class="countdownNumber">{{ countdown }}</span>
+        </div>
+
         <!-- Stability progress bar -->
         <div v-if="stableProgress > 0 && !isRunningDetection" class="progressBar">
           <div class="progressFill" :style="{ width: (stableProgress * 100) + '%' }"></div>
@@ -326,6 +331,8 @@ const textByLanguage = {
 
 const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr : textByLanguage.en));
 
+const countdown = computed(() => Math.ceil(3 * (1 - stableProgress.value)) || 1);
+
 </script>
 
 <style scoped>
@@ -405,6 +412,29 @@ const screenText = computed(() => (props.language === "fr" ? textByLanguage.fr :
 .statusBadge--idle {
   opacity: 0.7;
   font-weight: 500;
+}
+
+.countdownOverlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 9;
+  pointer-events: none;
+}
+
+.countdownNumber {
+  font-size: clamp(80px, 20vw, 160px);
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+  line-height: 1;
+  animation: countdownPop 0.15s ease-out;
+}
+
+@keyframes countdownPop {
+  from { transform: scale(1.3); opacity: 0.6; }
+  to   { transform: scale(1);   opacity: 1; }
 }
 
 .progressBar {
