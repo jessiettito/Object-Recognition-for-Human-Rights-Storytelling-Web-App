@@ -196,13 +196,13 @@ onMounted(async () => {
 
   if (!hasAskedBefore) {
     const ok = await startCamera();
-    if (ok) startLiveDetection();
+    if (ok) setTimeout(startLiveDetection, 3000);
     return;
   }
 
   if (cameraGrantedBefore) {
     const ok = await startCamera();
-    if (ok) startLiveDetection();
+    if (ok) setTimeout(startLiveDetection, 3000);
   }
 });
 
