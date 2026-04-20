@@ -37,6 +37,15 @@ async function loadModelIfNeeded() {
 }
 
 /**
+ * Preloads the backend and model eagerly so detection starts without delay.
+ * Call this as early as possible (e.g. on screen mount).
+ */
+export async function preloadModel() {
+  await initializeBackendIfNeeded();
+  await loadModelIfNeeded();
+}
+
+/**
  * Finds the highest-confidence prediction.
  */
 function getBestPrediction(predictions) {

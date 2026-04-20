@@ -57,7 +57,7 @@
 import { computed, ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 
-import { detectTopObjects, detectObjectsWithBoxes } from "../../logic/ObjectDetection.js";
+import { detectTopObjects, detectObjectsWithBoxes, preloadModel } from "../../logic/ObjectDetection.js";
 
 
 const props = defineProps({
@@ -83,7 +83,7 @@ let stableLabel = "";
 let stableStart = 0;
 
 const STABLE_MS = 3000;
-const MIN_CONFIDENCE = 0.4;
+const MIN_CONFIDENCE = 0.25;
 
 const CAMERA_REQUESTED_KEY = "cameraPermissionRequested";
 const CAMERA_GRANTED_KEY = "cameraPermissionGranted";
@@ -141,7 +141,7 @@ function startLiveDetection() {
     if (!cameraStarted.value || isRunningDetection.value || !video.value) return;
     if (video.value.readyState < 2) return;
     try {
-      const results = await detectObjectsWithBoxes(video.value, { topK: 1, ignorePerson: true, minScore: 0.3 });
+      const results = await detectObjectsWithBoxes(video.value, { topK: 1, ignorePerson: true, minScore: 0.2 });
 
       const top = results[0];
       if (top && top.confidence >= MIN_CONFIDENCE) {
@@ -166,8 +166,8 @@ function startLiveDetection() {
         stableStart = 0;
         stableProgress.value = 0;
       }
-    } catch {
-      // silently ignore live detection errors
+    } catch (err) {
+      console.warn("[LiveDetection] error:", err);
     }
   }, 300);
 }
@@ -184,6 +184,8 @@ function stopLiveDetection() {
 }
 
 onMounted(async () => {
+  preloadModel().catch(() => {}); // warm up TF backend + model in background
+
   const hasAskedBefore = localStorage.getItem(CAMERA_REQUESTED_KEY) === "true";
   const cameraGrantedBefore = localStorage.getItem(CAMERA_GRANTED_KEY) === "true";
 
