@@ -128,3 +128,38 @@ Date: April 2nd, 2026
    2. **Final handoff tentative dates: April 20th/21st** (in person) before 3 pm\!
 
 			Please propose times that you would like 
+
+# Final handoff meeting
+
+Date: April 21st, 2026 
+
+1. Deliverables  
+   1. Working prototype: fully functional browser based prototype, no installation   
+   2. Object recognition: detects the object and connect it to the real world human rights stories  
+   3. Smooth and simple UI  
+   4. Mapping system connects objects with themes, prompts and stories  
+   5. Detailed technical documentation, as well as set up instructions
+
+2. Updates:  
+   1. UX/UI improvements  
+      1. Added objects and themes in title for Stories Screen  
+      2. Added explore other objects section (5 randomly chose objects) on Stories Screen  
+      3. Breadcrumb navigation  
+      4. Next/previous buttons on Full Story Screen  
+   2. Added video rendering (on separate branch)  
+      1. Not merged it with our main branch as we have kept it optional  
+      2. Experience takes more time, and is a bit “overwhelming” when multiple objects are being shown at the same time.  
+3. Handoff & code transfer  
+   1. Repository and other technicalities are explained in detail in the docs folder in repo.  
+   2. Open source project  
+   3. Will be adding CMHR as admin collaborator   
+4. Limitations  
+   1. Detection                                                                        
+      1. COCO-SSD only recognizes \~80 common everyday objects.   
+         1. it's not trained on   human rights artifacts specifically, so niche or culturally specific objects won't be detected                                             
+      2. Confidence is inconsistent in poor lighting or with unusual angles          
+      3. Model takes a few seconds to load on first use (cold start)   
+   2. Performance                                                                        
+      1. Runs entirely in the browser. On older devices the detection can be slow or drain battery      
+   3. The object/story library is fixed (limited dataset): adding new objects or stories requires a  developer to update the data files manually. Not very efficient.
+
